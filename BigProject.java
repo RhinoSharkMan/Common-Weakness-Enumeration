@@ -1,17 +1,21 @@
 //GROUP PROJECT 2 - IT 355
 
 //Imports
-import java.util.Scanner;
 import java.util.ArrayList;
-
+import java.util.Scanner;
 
 //CLASS: BIG PROJECT
 public class BigProject {
+
+
+    //Avoids CWE-500: Public Static Field Not Marked Final by making global variable a constant
+    public static final int patientCapacity = 300; 
 
     //Big Project Vars
     private static ArrayList<Employee> employeeList = new ArrayList<>();
     private static ArrayList<Patient> patientList = new ArrayList<>();
 
+    private static int numPatients = 0;
 
     /**
      * Main method
@@ -23,7 +27,9 @@ public class BigProject {
         Employee employee1 = new Employee("John Wick", "Janitor", 999);
         employeeList.add(employee1);
         System.out.println("\tWELCOME TO HOSPITAL 2.0 DIRECTORY\n");
-        //loop through options
+        
+      //loop through options     
+      //Avoids CWE-484: Ommitted Break Staement in Switch by ensuring each case has a break statement.
         while (control != -1) {
             control = 0;
             //Display options
@@ -48,6 +54,14 @@ public class BigProject {
                 case 5:
                     break;
                 case 6:
+                    break;
+                //needs more work - need to validate int from scanner - need to validate index in range.
+                case 10:
+                    System.out.println("Provide index of Patient to copy:");
+                    int patientIndex = scanner.nextInt(); 
+
+                    Patient patientCopy = copyPatientInformation(patientList.get(patientIndex));
+
                     break;
                 default:
                     System.out.println("ERROR: not a valid choice. Try again.");
@@ -76,7 +90,7 @@ public class BigProject {
         System.out.println("OPTION 07: ");
         System.out.println("OPTION 08: ");
         System.out.println("OPTION 09: ");
-        System.out.println("OPTION 10: ");
+        System.out.println("OPTION 10: Copy Patient Information");
         System.out.println("OPTION 11: ");
         System.out.println("OPTION 12: ");
         System.out.println("OPTION 13: ");
@@ -104,6 +118,9 @@ public class BigProject {
     * TODO
     */
     public static void addPatient(Scanner scanner) {
+      
+        if (numPatients < patientCapacity)
+        {
         System.out.print("Enter patient name: ");
         String name = scanner.nextLine();
         System.out.print("Enter patient age: ");
@@ -114,7 +131,13 @@ public class BigProject {
         Patient patient = new Patient(name, age, id);
         patientList.add(patient);
         System.out.println("Patient added successfully!");
+        numPatients++;
         returnToMain(scanner);
+        }
+      else 
+      {
+         System.out.println("Invalid Patient");
+      }
     }
 
     /**
@@ -161,6 +184,19 @@ public class BigProject {
         }
     }
 
+    //creates a copy of a patient's information by copying their Patient object.
+    //method is private to ensure patient's information cannot be publically accessed through cloning. 
+    private static Patient copyPatientInformation(Patient original)
+    {
+       try {
+           return (Patient) original.clone();
+       } catch (CloneNotSupportedException e) {
+        System.out.println("Patient invalid, unable to copy"); 
+        return null; 
+       }
+    }
+
+    //Andrew - need to add method covering valid use of type conversion. Need input validation for methods.
 
 
 
@@ -182,15 +218,12 @@ class Employee {
         this.id = id;
     }
 
-    // Getter methods
-    public String getName() { return name; }
-    public String getPosition() { return position; }
-    public int getId() { return id; }
+    // Getter methods - Avoids CWE-767: Access to Critical Private Variable in Public Method
+    //by ensuring crticial information can only be accessed through private methods. 
+    private String getName() { return name; }
+    private String getPosition() { return position; }
+    private int getId() { return id; }
 } //END: Employee
-
-
-
-
 
 //CLASS: Patient
 class Patient {
@@ -204,8 +237,19 @@ class Patient {
         this.id = id;
     }
 
-    // Getter methods
-    public String getName() { return name; }
-    public int getAge() { return age; }
-    public int getId() { return id; }
+    //Returns a clone of the Patient object.
+    //Avoids CWE-580: clone() method Without super.clone() by calling 
+    //the necessary super.clone() method whenever cloning occurs. 
+    protected Object clone() throws CloneNotSupportedException
+    {
+        return super.clone(); 
+    }
+
+    // Getter methods - Avoids CWE-767: Access to Critical Private Variable in Public Method
+    //by ensuring crticial information can only be accessed through private methods. 
+    private String getName() { return name; }
+    private int getAge() { return age; }
+    private int getId() { return id; }
 } //END: Patient
+
+
