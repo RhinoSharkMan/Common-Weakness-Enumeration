@@ -4,9 +4,9 @@
 import java.util.ArrayList;
 import java.util.Scanner;
 
-
 //CLASS: BIG PROJECT
 public class BigProject {
+
 
     //Avoids CWE-500: Public Static Field Not Marked Final by making global variable a constant
     public static final int patientCapacity = 300; 
@@ -27,8 +27,9 @@ public class BigProject {
         Employee employee1 = new Employee("John Wick", "Janitor", 999);
         employeeList.add(employee1);
         System.out.println("\tWELCOME TO HOSPITAL 2.0 DIRECTORY\n");
-        //loop through options
-        //Avoids CWE-484: Ommitted Break Staement in Switch by ensuring each case has a break statement.
+        
+      //loop through options     
+      //Avoids CWE-484: Ommitted Break Staement in Switch by ensuring each case has a break statement.
         while (control != -1) {
             control = 0;
             //Display options
@@ -117,10 +118,9 @@ public class BigProject {
     * TODO
     */
     public static void addPatient(Scanner scanner) {
-        
+      
         if (numPatients < patientCapacity)
         {
-
         System.out.print("Enter patient name: ");
         String name = scanner.nextLine();
         System.out.print("Enter patient age: ");
@@ -134,6 +134,10 @@ public class BigProject {
         numPatients++;
         returnToMain(scanner);
         }
+      else 
+      {
+         System.out.println("Invalid Patient");
+      }
     }
 
     /**
@@ -195,6 +199,7 @@ public class BigProject {
     //Andrew - need to add method covering valid use of type conversion. Need input validation for methods.
 
 
+
 }//END: MAIN CLASS 
 
 
@@ -220,12 +225,8 @@ class Employee {
     private int getId() { return id; }
 } //END: Employee
 
-
-
-
-
 //CLASS: Patient
-class Patient implements Cloneable{
+class Patient {
     private String name;
     private int age;
     private int id;
@@ -250,3 +251,5 @@ class Patient implements Cloneable{
     private int getAge() { return age; }
     private int getId() { return id; }
 } //END: Patient
+
+
