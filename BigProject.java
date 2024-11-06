@@ -1,9 +1,8 @@
 //GROUP PROJECT 2 - IT 355
 
 //Imports
-import java.util.ArrayList;
-import java.util.Scanner;
-import java.util.Random;
+import java.util.*;
+import java.io.*;
 
 //CLASS: BIG PROJECT
 public class BigProject {
@@ -50,10 +49,13 @@ public class BigProject {
                     option2(scanner, employeeList);
                     break;
                 case 3:
+                    option3(scanner);
                     break;
                 case 4:
+                    option4(scanner);
                     break;
                 case 5:
+                    option5(scanner);
                     break;
                 case 6:
                     break;
@@ -85,9 +87,9 @@ public class BigProject {
     {
         System.out.println("OPTION 01: Check In New User");
         System.out.println("OPTION 02: Admin Mode");
-        System.out.println("OPTION 03: ");
-        System.out.println("OPTION 04: ");
-        System.out.println("OPTION 05: ");
+        System.out.println("OPTION 03: Export Prescription");
+        System.out.println("OPTION 04: Add prescription");
+        System.out.println("OPTION 05: Check In New Patient");
         System.out.println("OPTION 06: ");
         System.out.println("OPTION 07: ");
         System.out.println("OPTION 08: ");
@@ -123,7 +125,7 @@ public class BigProject {
     public static void addPatient(Scanner scanner) {
         if (numPatients < patientCapacity){
             System.out.print("Enter patient name: ");
-            String name = scanner.nextLine();
+            String name = scanner.next();
             System.out.print("Enter patient age: ");
             int age = scanner.nextInt();
             System.out.print("Enter patient ID: ");
@@ -138,6 +140,68 @@ public class BigProject {
       else {
          System.out.println("Invalid Patient");
       }
+    }
+
+    /**
+    * TODO
+    */
+    public static void exportPrescription(Scanner scanner) {
+        System.out.print("Enter patient ID: ");
+        int id = scanner.nextInt();
+        Patient patient = null;
+        boolean found = false;
+        for(int i = 0; i<patientList.size(); i++){
+            if (id == patientList.get(i).getId()){  
+                patient = patientList.get(i);
+                found = true;
+            }
+        }
+        if(found){
+            if(patient.getMedList()!=null){
+                patient.getMedList().exportMedList();
+            }
+            else{
+                System.out.println("This patient has no prescription");
+            }
+            returnToMain(scanner);
+        }
+        else{
+            System.out.println("Patient ID not found");
+        } 
+    }
+
+     /**
+    * TODO
+    */
+    public static void addPrescription(Scanner scanner) {
+        System.out.print("Enter patient ID: ");
+        int id = scanner.nextInt();
+        System.out.print("Enter medication: ");
+        String medication = scanner.next();
+        Patient patient = null;
+        boolean found = false;
+        for(int i = 0; i<patientList.size(); i++){
+            if (id == patientList.get(i).getId()){  
+                patient = patientList.get(i);
+                found = true;
+            }
+        }
+        if(found){
+            if(patient.getMedList()!=null){
+                patient.getMedList().addMedication(medication);
+                System.out.println("Medication successfully added to prescription");
+            }
+            else{
+                ArrayList<String> ml = new ArrayList<>();
+                patient.createPrescription(ml);
+                patient.getMedList().addMedication(medication);
+                System.out.println("Medication successfully added to prescription");
+            }
+            returnToMain(scanner);
+        }
+        else{
+            System.out.println("Patient ID not found");
+        } 
     }
 
     /**
@@ -231,6 +295,31 @@ public class BigProject {
         returnToMain(scanner);
     }
 
+    public static void option3(Scanner scanner)
+    {
+        try {
+            exportPrescription(scanner);
+        } catch (Exception e) {
+            System.out.println("ERROR: Patient ID not found");
+        }
+    }
+    public static void option4(Scanner scanner)
+    {
+        try {
+            addPrescription(scanner);
+        } catch (Exception e) {
+            System.out.println("ERROR: Unable to add prescription");
+        }
+    }
+    public static void option5(Scanner scanner)
+    {
+        try {
+            addPatient(scanner);
+        } catch (Exception e) {
+            System.out.println("ERROR: could not add patient. Please add valid input");
+        }
+    }
+
 
     //creates a copy of a patient's information by copying their Patient object.
     //method is private to ensure patient's information cannot be publically accessed through cloning. 
@@ -298,11 +387,18 @@ class Patient {
     private String name;
     private int age;
     private int id;
+    private Prescription med;
 
     public Patient(String name, int age, int id) {
         this.name = name;
         this.age = age;
         this.id = id;
+        this.med = null;
+    }
+
+    public void createPrescription(ArrayList<String> medList){
+        Prescription ml = new Prescription(medList);
+        med = ml;
     }
 
     //Returns a clone of the Patient object.
@@ -317,7 +413,42 @@ class Patient {
     //by ensuring crticial information can only be accessed through private methods. 
     private String getName() { return name; }
     private int getAge() { return age; }
-    private int getId() { return id; }
+    public int getId() { return id; }
+    public Prescription getMedList() { return med; }
 } //END: Patient
 
+class Prescription {
+    // marked private so that internal state of medList is only modified as intended - CWE-607
+    private static final ArrayList<String> medList = new ArrayList<>();
 
+    public Prescription(ArrayList<String> medList){
+        
+    }
+
+    public void addMedication(String med){
+        medList.add(med);
+       
+    }
+
+    public void exportMedList(){
+        String content = "";
+        ArrayList<String> ml = getMedList();
+
+        for(int i = 0; i < ml.size(); i++){
+            content = content + "\n" + ml.get(i);
+        }
+        try (FileWriter writer = new FileWriter("Prescription.txt")){
+            writer.write(content);
+            System.out.println("Prescription exported successfully");
+        }catch (IOException e){
+            System.out.println("Error Occured while exporting med list");
+        }
+    }
+    /**
+    * @return clone of medList
+    */
+    public ArrayList<String> getMedList(){
+        //returns a defensive copy of medList CWE-375
+        return new ArrayList<>(medList);
+    }
+}//END: Prescription
