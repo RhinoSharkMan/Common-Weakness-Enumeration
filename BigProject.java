@@ -12,7 +12,6 @@ public class BigProject {
     private static ArrayList<Employee> employeeList = new ArrayList<>();
     private static ArrayList<Patient> patientList = new ArrayList<>();
 
-
     /**
      * Main method
      */
@@ -40,10 +39,13 @@ public class BigProject {
                     option1(scanner);
                     break;
                 case 2:
+                    option2(scanner);
                     break;
                 case 3:
+                    option3(scanner);
                     break;
                 case 4:
+                    option4(scanner);
                     break;
                 case 5:
                     break;
@@ -69,8 +71,8 @@ public class BigProject {
     {
         System.out.println("OPTION 01: Check In New User");
         System.out.println("OPTION 02: Check In New Patient");
-        System.out.println("OPTION 03: ");
-        System.out.println("OPTION 04: ");
+        System.out.println("OPTION 03: Export Prescription");
+        System.out.println("OPTION 04: Add prescription");
         System.out.println("OPTION 05: ");
         System.out.println("OPTION 06: ");
         System.out.println("OPTION 07: ");
@@ -105,7 +107,7 @@ public class BigProject {
     */
     public static void addPatient(Scanner scanner) {
         System.out.print("Enter patient name: ");
-        String name = scanner.nextLine();
+        String name = scanner.next();
         System.out.print("Enter patient age: ");
         int age = scanner.nextInt();
         System.out.print("Enter patient ID: ");
@@ -115,6 +117,68 @@ public class BigProject {
         patientList.add(patient);
         System.out.println("Patient added successfully!");
         returnToMain(scanner);
+    }
+
+    /**
+    * TODO
+    */
+    public static void exportPrescription(Scanner scanner) {
+        System.out.print("Enter patient ID: ");
+        int id = scanner.nextInt();
+        Patient patient = null;
+        boolean found = false;
+        for(int i = 0; i<patientList.size(); i++){
+            if (id == patientList.get(i).getId()){  
+                patient = patientList.get(i);
+                found = true;
+            }
+        }
+        if(found){
+            if(patient.getMedList()!=null){
+                patient.getMedList().exportMedList();
+            }
+            else{
+                System.out.println("This patient has no prescription");
+            }
+            returnToMain(scanner);
+        }
+        else{
+            System.out.println("Patient ID not found");
+        } 
+    }
+
+     /**
+    * TODO
+    */
+    public static void addPrescription(Scanner scanner) {
+        System.out.print("Enter patient ID: ");
+        int id = scanner.nextInt();
+        System.out.print("Enter medication: ");
+        String medication = scanner.next();
+        Patient patient = null;
+        boolean found = false;
+        for(int i = 0; i<patientList.size(); i++){
+            if (id == patientList.get(i).getId()){  
+                patient = patientList.get(i);
+                found = true;
+            }
+        }
+        if(found){
+            if(patient.getMedList()!=null){
+                patient.getMedList().addMedication(medication);
+                System.out.println("Medication successfully added to prescription");
+            }
+            else{
+                ArrayList<String> ml = new ArrayList<>();
+                patient.createPrescription(ml);
+                patient.getMedList().addMedication(medication);
+                System.out.println("Medication successfully added to prescription");
+            }
+            returnToMain(scanner);
+        }
+        else{
+            System.out.println("Patient ID not found");
+        } 
     }
 
     /**
@@ -148,7 +212,7 @@ public class BigProject {
         System.out.println(""); // Print a blank line for spacing
     }
 
-    /**
+    /** Preventing uncaught exceptions using try-catch CWE-248 
      * TODO
      * option1 - check in new user
     */
@@ -168,8 +232,22 @@ public class BigProject {
             System.out.println("ERROR: could not add patient. Please add valid input");
         }
     }
-
-
+    public static void option3(Scanner scanner)
+    {
+        try {
+            exportPrescription(scanner);
+        } catch (Exception e) {
+            System.out.println("ERROR: Patient ID not found");
+        }
+    }
+    public static void option4(Scanner scanner)
+    {
+        try {
+            addPrescription(scanner);
+        } catch (Exception e) {
+            System.out.println("ERROR: Unable to add prescription");
+        }
+    }
 
 
 }//END: MAIN CLASS 
@@ -205,29 +283,38 @@ class Patient {
     private String name;
     private int age;
     private int id;
+    private Prescription med;
 
     public Patient(String name, int age, int id) {
         this.name = name;
         this.age = age;
         this.id = id;
+        this.med = null;
+    }
+
+    public void createPrescription(ArrayList<String> medList){
+        Prescription ml = new Prescription(medList);
+        med = ml;
     }
 
     // Getter methods
     public String getName() { return name; }
     public int getAge() { return age; }
     public int getId() { return id; }
+    public Prescription getMedList() { return med; }
 } //END: Patient
 
-class Medication {
+class Prescription {
     // marked private so that internal state of medList is only modified as intended - CWE-607
-    private ArrayList<String> medList;
+    private static final ArrayList<String> medList = new ArrayList<>();
 
-    public Medication(ArrayList<String> medList){
-        this.medList = medList;
+    public Prescription(ArrayList<String> medList){
+        
     }
 
     public void addMedication(String med){
         medList.add(med);
+       
     }
 
     public void exportMedList(){
@@ -249,7 +336,6 @@ class Medication {
     */
     public ArrayList<String> getMedList(){
         //returns a defensive copy of medList CWE-375
-        ArrayList<String> ml = medList;
-        return ml;
+        return new ArrayList<>(medList);
     }
 }//END: medication
