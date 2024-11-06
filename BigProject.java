@@ -244,7 +244,7 @@ public class BigProject {
         return 100000 + random.nextInt(900000);
     }
 
-    /**
+    /** Preventing uncaught exceptions using try-catch CWE-248 
      * TODO
      * option1 - check in new user
     */
