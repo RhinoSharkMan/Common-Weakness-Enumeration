@@ -3,6 +3,7 @@
 //Imports
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.Random;
 
 //CLASS: BIG PROJECT
 public class BigProject {
@@ -24,7 +25,7 @@ public class BigProject {
         //setup variables
         Scanner scanner = new Scanner(System.in);
         int control = 0;
-        Employee employee1 = new Employee("John Wick", "Janitor", 999);
+        Employee employee1 = new Employee("John Wick", "Janitor", 999, generateRandomSixDigitNumber());
         employeeList.add(employee1);
         System.out.println("\tWELCOME TO HOSPITAL 2.0 DIRECTORY\n");
         
@@ -46,6 +47,7 @@ public class BigProject {
                     option1(scanner);
                     break;
                 case 2:
+                    option2(scanner, employeeList);
                     break;
                 case 3:
                     break;
@@ -82,7 +84,7 @@ public class BigProject {
     public static void printOptions()
     {
         System.out.println("OPTION 01: Check In New User");
-        System.out.println("OPTION 02: ");
+        System.out.println("OPTION 02: Admin Mode");
         System.out.println("OPTION 03: ");
         System.out.println("OPTION 04: ");
         System.out.println("OPTION 05: ");
@@ -108,7 +110,8 @@ public class BigProject {
         System.out.print("Enter employee ID: ");
         //TODO - ensure ID is unique
         int id = scanner.nextInt();
-        Employee employee = new Employee(name, position, id);
+        int pin = generateRandomSixDigitNumber();
+        Employee employee = new Employee(name, position, id, pin);
         employeeList.add(employee);
         System.out.println("Employee added successfully!");
         returnToMain(scanner);
@@ -118,24 +121,21 @@ public class BigProject {
     * TODO
     */
     public static void addPatient(Scanner scanner) {
-      
-        if (numPatients < patientCapacity)
-        {
-        System.out.print("Enter patient name: ");
-        String name = scanner.nextLine();
-        System.out.print("Enter patient age: ");
-        int age = scanner.nextInt();
-        System.out.print("Enter patient ID: ");
-        //TODO - ensure ID is unique
-        int id = scanner.nextInt();
-        Patient patient = new Patient(name, age, id);
-        patientList.add(patient);
-        System.out.println("Patient added successfully!");
-        numPatients++;
-        returnToMain(scanner);
+        if (numPatients < patientCapacity){
+            System.out.print("Enter patient name: ");
+            String name = scanner.nextLine();
+            System.out.print("Enter patient age: ");
+            int age = scanner.nextInt();
+            System.out.print("Enter patient ID: ");
+            //TODO - ensure ID is unique
+            int id = scanner.nextInt();
+            Patient patient = new Patient(name, age, id);
+            patientList.add(patient);
+            System.out.println("Patient added successfully!");
+            numPatients++;
+            returnToMain(scanner);
         }
-      else 
-      {
+      else {
          System.out.println("Invalid Patient");
       }
     }
@@ -175,6 +175,15 @@ public class BigProject {
      * TODO
      * option1 - check in new user
     */
+    public static int generateRandomSixDigitNumber() {
+        Random random = new Random();
+        return 100000 + random.nextInt(900000);
+    }
+
+    /**
+     * TODO
+     * option1 - check in new user
+    */
     public static void option1(Scanner scanner)
     {
         try {
@@ -183,6 +192,45 @@ public class BigProject {
             System.out.println("ERROR: could not add patient. Please add valid input");
         }
     }
+
+    /**
+     * TODO
+     * option2 - admin mode
+    */
+    public static void option2(Scanner scanner, ArrayList<Employee> employeeList)
+    {
+        try {
+            Employee temp = null;
+            System.out.println("\tAdmin Login");;
+            System.out.print("Enter User ID: ");
+            int userId = scanner.nextInt();
+            for (Employee emp : employeeList) {
+                if (emp.id == userId) {
+                    temp= emp;
+                    break;
+                }
+            }
+            //Prompt for PIN
+            if (temp != null) {
+                System.out.print("Enter PIN: ");
+                int pin = scanner.nextInt();
+                // Check if the entered PIN matches the employee's PIN
+                if (temp.comparePIN(temp, pin) == true) {
+                    System.out.println("Login successful. Welcome, " + temp.name + "!");
+                    System.out.println("it is a shame admin mode cannot do anything lol");
+                } else {
+                    System.out.println("ERROR: Incorrect PIN. Returning...");
+                }
+            } else {
+                System.out.println("ERROR: User ID not found.");
+            }
+            
+        } catch (Exception e) {
+            System.out.println("ERROR: request could not be granted");
+        }
+        returnToMain(scanner);
+    }
+
 
     //creates a copy of a patient's information by copying their Patient object.
     //method is private to ensure patient's information cannot be publically accessed through cloning. 
@@ -208,14 +256,16 @@ public class BigProject {
 
 //CLASS: Employee
 class Employee {
-    private String name;
-    private String position;
-    private int id;
+    public String name;
+    public String position;
+    public int id;
+    private int pin;
 
-    public Employee(String name, String position, int id) {
+    public Employee(String name, String position, int id, int pin) {
         this.name = name;
         this.position = position;
         this.id = id;
+        this.pin = pin;
     }
 
     // Getter methods - Avoids CWE-767: Access to Critical Private Variable in Public Method
@@ -223,6 +273,24 @@ class Employee {
     private String getName() { return name; }
     private String getPosition() { return position; }
     private int getId() { return id; }
+    private int getPin(){
+        return pin;
+    }
+
+    public boolean comparePIN(Employee x, int test)
+    {
+        if(test == x.pin)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+
+
 } //END: Employee
 
 //CLASS: Patient
