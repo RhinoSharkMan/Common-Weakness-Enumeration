@@ -8,10 +8,14 @@ import java.io.*;
 //CLASS: BIG PROJECT
 public class BigProject {
 
+    //Avoids CWE-500: Public Static Field Not Marked Final by making global variable a constant
+    public static final int patientCapacity = 300; 
+
     //Big Project Vars
     private static ArrayList<Employee> employeeList = new ArrayList<>();
     private static ArrayList<Patient> patientList = new ArrayList<>();
 
+    private static int numPatients = 0;
     /**
      * Main method
      */
@@ -51,6 +55,14 @@ public class BigProject {
                     break;
                 case 6:
                     break;
+                //needs more work - need to validate int from scanner - need to validate index in range.
+                case 10:
+                    System.out.println("Provide index of Patient to copy:");
+                    int patientIndex = scanner.nextInt(); 
+
+                    Patient patientCopy = copyPatientInformation(patientList.get(patientIndex));
+
+                    break;
                 default:
                     System.out.println("ERROR: not a valid choice. Try again.");
             }//end case
@@ -78,7 +90,7 @@ public class BigProject {
         System.out.println("OPTION 07: ");
         System.out.println("OPTION 08: ");
         System.out.println("OPTION 09: ");
-        System.out.println("OPTION 10: ");
+        System.out.println("OPTION 10: Copy Patient Information");
         System.out.println("OPTION 11: ");
         System.out.println("OPTION 12: ");
         System.out.println("OPTION 13: ");
@@ -102,10 +114,13 @@ public class BigProject {
         returnToMain(scanner);
     }
 
-    /**
+     /**
     * TODO
     */
     public static void addPatient(Scanner scanner) {
+      
+        if (numPatients < patientCapacity)
+        {
         System.out.print("Enter patient name: ");
         String name = scanner.next();
         System.out.print("Enter patient age: ");
@@ -116,7 +131,13 @@ public class BigProject {
         Patient patient = new Patient(name, age, id);
         patientList.add(patient);
         System.out.println("Patient added successfully!");
+        numPatients++;
         returnToMain(scanner);
+        }
+      else 
+      {
+         System.out.println("Invalid Patient");
+      }
     }
 
     /**
@@ -249,6 +270,20 @@ public class BigProject {
         }
     }
 
+    //creates a copy of a patient's information by copying their Patient object.
+    //method is private to ensure patient's information cannot be publically accessed through cloning. 
+    private static Patient copyPatientInformation(Patient original)
+    {
+       try {
+           return (Patient) original.clone();
+       } catch (CloneNotSupportedException e) {
+        System.out.println("Patient invalid, unable to copy"); 
+        return null; 
+       }
+    }
+
+    //Andrew - need to add method covering valid use of type conversion. Need input validation for methods.
+
 
 }//END: MAIN CLASS 
 
@@ -295,6 +330,13 @@ class Patient {
     public void createPrescription(ArrayList<String> medList){
         Prescription ml = new Prescription(medList);
         med = ml;
+    }
+    //Returns a clone of the Patient object.
+    //Avoids CWE-580: clone() method Without super.clone() by calling 
+    //the necessary super.clone() method whenever cloning occurs. 
+    protected Object clone() throws CloneNotSupportedException
+    {
+        return super.clone(); 
     }
 
     // Getter methods
