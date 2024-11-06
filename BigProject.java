@@ -3,6 +3,11 @@
 //Imports
 import java.util.*;
 import java.io.*;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Scanner;
+import java.util.Random;
 
 //CLASS: BIG PROJECT
 public class BigProject {
@@ -14,13 +19,16 @@ public class BigProject {
     //Big Project Vars
     private static ArrayList<Employee> employeeList = new ArrayList<>();
     private static ArrayList<Patient> patientList = new ArrayList<>();
-
+    private static DaySystem daySystem = new DaySystem();
     private static int numPatients = 0;
 
     /**
      * Main method
      */
     public static void main(String[] args){
+        //Start the day-cycling thread
+        Thread dayThread = new Thread(daySystem);
+        dayThread.start();
         //setup variables
         Scanner scanner = new Scanner(System.in);
         int control = 0;
@@ -58,6 +66,7 @@ public class BigProject {
                     option5(scanner);
                     break;
                 case 6:
+                    displayCurrentDayAndTime(scanner);
                     break;
                 //needs more work - need to validate int from scanner - need to validate index in range.
                 case 10:
@@ -90,7 +99,7 @@ public class BigProject {
         System.out.println("OPTION 03: Export Prescription");
         System.out.println("OPTION 04: Add prescription");
         System.out.println("OPTION 05: Check In New Patient");
-        System.out.println("OPTION 06: ");
+        System.out.println("OPTION 06: Today's Date");
         System.out.println("OPTION 07: ");
         System.out.println("OPTION 08: ");
         System.out.println("OPTION 09: ");
@@ -230,7 +239,7 @@ public class BigProject {
         if (scanner.hasNextLine()) {
             scanner.nextLine();
         }
-        System.out.print("\nPress 'enter' to return to the main menu...");
+        System.out.print("\n\tPress 'enter' to return to the main menu...");
         scanner.nextLine();
         System.out.println(""); // Print a blank line for spacing
     }
@@ -334,6 +343,24 @@ public class BigProject {
     }
 
     //Andrew - need to add method covering valid use of type conversion. Need input validation for methods.
+
+    /**
+     * TODO
+     * option5 - display current day and time
+     * 
+    */
+    public static void displayCurrentDayAndTime(Scanner scanner) 
+    {
+        String currentDay = daySystem.getCurrentDay();
+        int daysPassed = daySystem.getTotalDaysPassed();
+        String currentTime = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+        System.out.println("\nCurrent day: " + currentDay + ", Time: " + currentTime);
+        System.out.println("Total Days Passed: " + daysPassed);
+        returnToMain(scanner);
+    }
+
+
+
 
 
 
@@ -452,3 +479,42 @@ class Prescription {
         return new ArrayList<>(medList);
     }
 }//END: Prescription
+
+
+//CLASS: day system
+class DaySystem implements Runnable {
+    private final String[] days = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+    private int dayIndex = 0;
+    private static int totalDaysPassed = 0; //shared resource
+    
+    @Override
+    public void run() {
+        while (Thread.currentThread().isInterrupted() == false) {
+            advanceDay();
+            try {
+                Thread.sleep(20000); //delay for 20 seconds before moving to the next day
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt(); //exit gracefully
+            }
+        }
+    }
+
+    public synchronized String getCurrentDay() {
+        return days[dayIndex];
+    }
+
+    public static synchronized int getTotalDaysPassed() {
+        return totalDaysPassed; //Safely retrieve total days passed
+    }
+
+    private synchronized void advanceDay() {
+        dayIndex = (dayIndex + 1) % days.length;
+        totalDaysPassed++; //Safely increment total days passed
+    }
+
+    public static synchronized void resetTotalDaysPassed() {
+        totalDaysPassed = 0; //Safely reset total days passed
+    }
+
+
+} //END: DaySystem
