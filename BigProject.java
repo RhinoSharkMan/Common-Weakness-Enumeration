@@ -1,6 +1,8 @@
 //GROUP PROJECT 2 - IT 355
 
 //Imports
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.Random;
@@ -15,13 +17,16 @@ public class BigProject {
     //Big Project Vars
     private static ArrayList<Employee> employeeList = new ArrayList<>();
     private static ArrayList<Patient> patientList = new ArrayList<>();
-
     private static int numPatients = 0;
+    private static DaySystem daySystem = new DaySystem();
 
     /**
      * Main method
      */
     public static void main(String[] args){
+        //Start the day-cycling thread
+        Thread dayThread = new Thread(daySystem);
+        dayThread.start();
         //setup variables
         Scanner scanner = new Scanner(System.in);
         int control = 0;
@@ -42,6 +47,7 @@ public class BigProject {
             switch (control) {
                 case -1:
                     System.out.println("\nThank you...exiting");
+                    dayThread.interrupt(); //end thread
                     break; //exit the loop
                 case 1:
                     option1(scanner);
@@ -50,6 +56,7 @@ public class BigProject {
                     option2(scanner, employeeList);
                     break;
                 case 3:
+                    displayCurrentDayAndTime(scanner);
                     break;
                 case 4:
                     break;
@@ -85,7 +92,7 @@ public class BigProject {
     {
         System.out.println("OPTION 01: Check In New User");
         System.out.println("OPTION 02: Admin Mode");
-        System.out.println("OPTION 03: ");
+        System.out.println("OPTION 03: Today's Date");
         System.out.println("OPTION 04: ");
         System.out.println("OPTION 05: ");
         System.out.println("OPTION 06: ");
@@ -166,18 +173,20 @@ public class BigProject {
         if (scanner.hasNextLine()) {
             scanner.nextLine();
         }
-        System.out.print("\nPress 'enter' to return to the main menu...");
+        System.out.print("\n\tPress 'enter' to return to the main menu...");
         scanner.nextLine();
         System.out.println(""); // Print a blank line for spacing
     }
 
     /**
      * TODO
-     * option1 - check in new user
+     * 
     */
     public static int generateRandomSixDigitNumber() {
         Random random = new Random();
-        return 100000 + random.nextInt(900000);
+        int pin = 100000 + random.nextInt(900000);
+        //System.out.println(pin); //in case you wanted to see the value
+        return pin;
     }
 
     /**
@@ -231,6 +240,22 @@ public class BigProject {
         returnToMain(scanner);
     }
 
+    /**
+     * TODO
+     * option3 - display current day and time
+     * 
+    */
+    public static void displayCurrentDayAndTime(Scanner scanner) 
+    {
+        String currentDay = daySystem.getCurrentDay();
+        int daysPassed = daySystem.getTotalDaysPassed();
+        String currentTime = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+        System.out.println("\nCurrent day: " + currentDay + ", Time: " + currentTime);
+        System.out.println("Total Days Passed: " + daysPassed);
+        returnToMain(scanner);
+    }
+
+
 
     //creates a copy of a patient's information by copying their Patient object.
     //method is private to ensure patient's information cannot be publically accessed through cloning. 
@@ -270,9 +295,12 @@ class Employee {
 
     // Getter methods - Avoids CWE-767: Access to Critical Private Variable in Public Method
     //by ensuring crticial information can only be accessed through private methods. 
-    private String getName() { return name; }
-    private String getPosition() { return position; }
-    private int getId() { return id; }
+    private String getName() { 
+        return name; }
+    private String getPosition() { 
+        return position; }
+    private int getId() { 
+        return id; }
     private int getPin(){
         return pin;
     }
@@ -321,3 +349,40 @@ class Patient {
 } //END: Patient
 
 
+//CLASS: day system
+class DaySystem implements Runnable {
+    private final String[] days = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+    private int dayIndex = 0;
+    private static int totalDaysPassed = 0; //shared resource
+    
+    @Override
+    public void run() {
+        while (Thread.currentThread().isInterrupted() == false) {
+            advanceDay();
+            try {
+                Thread.sleep(20000); //delay for 20 seconds before moving to the next day
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt(); //exit gracefully
+            }
+        }
+    }
+
+    public synchronized String getCurrentDay() {
+        return days[dayIndex];
+    }
+
+    public static synchronized int getTotalDaysPassed() {
+        return totalDaysPassed; //Safely retrieve total days passed
+    }
+
+    private synchronized void advanceDay() {
+        dayIndex = (dayIndex + 1) % days.length;
+        totalDaysPassed++; //Safely increment total days passed
+    }
+
+    public static synchronized void resetTotalDaysPassed() {
+        totalDaysPassed = 0; //Safely reset total days passed
+    }
+
+
+} //END: DaySystem
