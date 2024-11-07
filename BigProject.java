@@ -34,7 +34,6 @@ public class BigProject {
         Employee employee1 = new Employee("John Wick", "Janitor", 999, generateRandomSixDigitNumber());
         employeeList.add(employee1);
         System.out.println("\tWELCOME TO HOSPITAL 2.0 DIRECTORY\n");
-        
       //loop through options     
       //Avoids CWE-484: Ommitted Break Staement in Switch by ensuring each case has a break statement.
         while (control != -1) {
@@ -48,6 +47,7 @@ public class BigProject {
             switch (control) {
                 case -1:
                     System.out.println("\nThank you...exiting");
+                    dayThread.interrupt();
                     break; //exit the loop
                 case 1:
                     option1(scanner);
