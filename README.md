@@ -25,3 +25,22 @@ Done within the method generateRandomSixDigitNumber()
 
 # CWE CASE 06: CWE-125: Out-of-Bounds Read 
 -this CWE is demonstated 
+
+ANDREW CONTENT
+# CWE-681: Incorrect Conversion between Numeric Types
+-this CWE is demonstrated and avoided by..
+
+# CWE-628: Function Call with Incorrectly Specified Arguments
+-this CWE is demonstrated and avoided by including a variety of validations for function arguments. Doing so ensures that the function works properly as all arguments are expected values.
+
+# CWE-500: Public Static Field Not Marked Final
+-this CWE is demonstrated and avoided by the inclusion of a public static variable that is marked final. This ensures that the globally accessable variable is a constant whos value cannot be changed after being set.
+
+# CWE-484: Omitted Break Statement in Switch
+-this CWE is demonstrated and avoided by including a break statement after each case in the switch block. Break statements allow for the program to properly exit the block once the case is completed, avoiding fallthrough behavior. 
+
+# CWE-580: clone() method without super.clone()
+-this CWE is demonstrated and avoided by ensuring the use of super.clone(). Patient objects can be cloned, and whenever cloning occurs super.clone() is called to ensure the object is of the correct type. 
+
+# CWE-767: Access to Critical Private Variable via Public Method
+-this CWE is demonstrated and avoided through preventing easy access to crticial values. Whenever these values are accessed or modified, it should be done in non public methods to prevent malicious users from modifying or accessing values without proper privileges.  
