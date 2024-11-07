@@ -28,7 +28,7 @@ Done within the method generateRandomSixDigitNumber()
 
 ANDREW CONTENT
 # CWE-681: Incorrect Conversion between Numeric Types
--this CWE is demonstrated and avoided by..
+-this CWE is demonstrated and avoided by only performing conversions when information is not lost. For example, an integer is converted to a double for a division operation. As this conversion does not lose information and is the intended operation of the program, this weakness is avoided. 
 
 # CWE-628: Function Call with Incorrectly Specified Arguments
 -this CWE is demonstrated and avoided by including a variety of validations for function arguments. Doing so ensures that the function works properly as all arguments are expected values.
