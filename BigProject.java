@@ -1,13 +1,12 @@
 //GROUP PROJECT 2 - IT 355
 
 //Imports
-import java.util.*;
 import java.io.*;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Scanner;
 import java.util.Random;
+import java.util.Scanner;
 
 //CLASS: BIG PROJECT
 public class BigProject {
@@ -68,13 +67,36 @@ public class BigProject {
                 case 6:
                     displayCurrentDayAndTime(scanner);
                     break;
-                //needs more work - need to validate int from scanner - need to validate index in range.
+                //ISSUE - Not correctly copying 
                 case 10:
                     System.out.println("Provide index of Patient to copy:");
                     int patientIndex = scanner.nextInt(); 
 
+                    if (patientIndex < patientList.size() && patientIndex >= 0)
+                    {
                     Patient patientCopy = copyPatientInformation(patientList.get(patientIndex));
+                    System.out.println("Patient's information sucessfully copied.");
+                    System.out.println("Original Patient Name: " + patientList.get(patientIndex).getName());
+                    System.out.println("Copied Patient Name: " + patientCopy.getName() + "\n");
+                    }
+                    else
+                    {
+                        System.out.println("Patient index out of range\n");
+                    }
+                    break; 
+                case 11:
+                    System.out.println("Calculating Employee to Patient Ratio: ");
 
+                    if (patientList.size() > 0)
+                    {
+                    double ratio = findRatio(); 
+                    System.out.println("There are approximately " + ratio + " employees per patient\n");
+                    }
+
+                    else 
+                    {
+                        System.out.println("Patient list empty - cannot compute average\n"); 
+                    }
                     break;
                 default:
                     System.out.println("ERROR: not a valid choice. Try again.");
@@ -104,7 +126,7 @@ public class BigProject {
         System.out.println("OPTION 08: ");
         System.out.println("OPTION 09: ");
         System.out.println("OPTION 10: Copy Patient Information");
-        System.out.println("OPTION 11: ");
+        System.out.println("OPTION 11: Employee to Patient Ratio");
         System.out.println("OPTION 12: ");
         System.out.println("OPTION 13: ");
         return;
@@ -342,7 +364,7 @@ public class BigProject {
        }
     }
 
-    //Andrew - need to add method covering valid use of type conversion. Need input validation for methods.
+
 
     /**
      * TODO
@@ -359,8 +381,20 @@ public class BigProject {
         returnToMain(scanner);
     }
 
+    /*
+     * Finds the ratio of employees to patients.
+     * Converts from int to double - avoids CWE-681:Incorrect Conversion
+     * between Numeric Types as no information is lost in this conversion.
+     * @return double result from dividing size of employeeList by size of patientList 
+     */
+    private static double findRatio()
+    {
+        int numEmployees = employeeList.size(); 
+        int numPatients = patientList.size(); 
 
-
+        
+        return (double) numEmployees / numPatients; 
+    }
 
 
 
@@ -410,7 +444,7 @@ class Employee {
 } //END: Employee
 
 //CLASS: Patient
-class Patient {
+class Patient implements Cloneable {
     private String name;
     private int age;
     private int id;
@@ -438,7 +472,7 @@ class Patient {
 
     // Getter methods - Avoids CWE-767: Access to Critical Private Variable in Public Method
     //by ensuring crticial information can only be accessed through private methods. 
-    private String getName() { return name; }
+    protected String getName() { return name; }
     private int getAge() { return age; }
     public int getId() { return id; }
     public Prescription getMedList() { return med; }
