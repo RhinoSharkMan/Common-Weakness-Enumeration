@@ -1,12 +1,16 @@
 //GROUP PROJECT 2 - IT 355
 
 //Imports
-import java.util.*;
 import java.io.*;
-
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Random;
+import java.util.Scanner;
 
 //CLASS: BIG PROJECT
 public class BigProject {
+
 
     //Avoids CWE-500: Public Static Field Not Marked Final by making global variable a constant
     public static final int patientCapacity = 300; 
@@ -14,19 +18,25 @@ public class BigProject {
     //Big Project Vars
     private static ArrayList<Employee> employeeList = new ArrayList<>();
     private static ArrayList<Patient> patientList = new ArrayList<>();
-
+    private static DaySystem daySystem = new DaySystem();
     private static int numPatients = 0;
+
     /**
      * Main method
      */
     public static void main(String[] args){
+        //Start the day-cycling thread
+        Thread dayThread = new Thread(daySystem);
+        dayThread.start();
         //setup variables
         Scanner scanner = new Scanner(System.in);
         int control = 0;
-        Employee employee1 = new Employee("John Wick", "Janitor", 999);
+        Employee employee1 = new Employee("John Wick", "Janitor", 999, generateRandomSixDigitNumber());
         employeeList.add(employee1);
         System.out.println("\tWELCOME TO HOSPITAL 2.0 DIRECTORY\n");
-        //loop through options
+        
+      //loop through options     
+      //Avoids CWE-484: Ommitted Break Staement in Switch by ensuring each case has a break statement.
         while (control != -1) {
             control = 0;
             //Display options
@@ -43,7 +53,7 @@ public class BigProject {
                     option1(scanner);
                     break;
                 case 2:
-                    option2(scanner);
+                    option2(scanner, employeeList);
                     break;
                 case 3:
                     option3(scanner);
@@ -52,16 +62,41 @@ public class BigProject {
                     option4(scanner);
                     break;
                 case 5:
+                    option5(scanner);
                     break;
                 case 6:
+                    displayCurrentDayAndTime(scanner);
                     break;
-                //needs more work - need to validate int from scanner - need to validate index in range.
+                //ISSUE - Not correctly copying 
                 case 10:
                     System.out.println("Provide index of Patient to copy:");
                     int patientIndex = scanner.nextInt(); 
 
+                    if (patientIndex < patientList.size() && patientIndex >= 0)
+                    {
                     Patient patientCopy = copyPatientInformation(patientList.get(patientIndex));
+                    System.out.println("Patient's information sucessfully copied.");
+                    System.out.println("Original Patient Name: " + patientList.get(patientIndex).getName());
+                    System.out.println("Copied Patient Name: " + patientCopy.getName() + "\n");
+                    }
+                    else
+                    {
+                        System.out.println("Patient index out of range\n");
+                    }
+                    break; 
+                case 11:
+                    System.out.println("Calculating Employee to Patient Ratio: ");
 
+                    if (patientList.size() > 0)
+                    {
+                    double ratio = findRatio(); 
+                    System.out.println("There are approximately " + ratio + " employees per patient\n");
+                    }
+
+                    else 
+                    {
+                        System.out.println("Patient list empty - cannot compute average\n"); 
+                    }
                     break;
                 default:
                     System.out.println("ERROR: not a valid choice. Try again.");
@@ -82,16 +117,16 @@ public class BigProject {
     public static void printOptions()
     {
         System.out.println("OPTION 01: Check In New User");
-        System.out.println("OPTION 02: Check In New Patient");
+        System.out.println("OPTION 02: Admin Mode");
         System.out.println("OPTION 03: Export Prescription");
         System.out.println("OPTION 04: Add prescription");
-        System.out.println("OPTION 05: ");
-        System.out.println("OPTION 06: ");
+        System.out.println("OPTION 05: Check In New Patient");
+        System.out.println("OPTION 06: Today's Date");
         System.out.println("OPTION 07: ");
         System.out.println("OPTION 08: ");
         System.out.println("OPTION 09: ");
         System.out.println("OPTION 10: Copy Patient Information");
-        System.out.println("OPTION 11: ");
+        System.out.println("OPTION 11: Employee to Patient Ratio");
         System.out.println("OPTION 12: ");
         System.out.println("OPTION 13: ");
         return;
@@ -108,34 +143,32 @@ public class BigProject {
         System.out.print("Enter employee ID: ");
         //TODO - ensure ID is unique
         int id = scanner.nextInt();
-        Employee employee = new Employee(name, position, id);
+        int pin = generateRandomSixDigitNumber();
+        Employee employee = new Employee(name, position, id, pin);
         employeeList.add(employee);
         System.out.println("Employee added successfully!");
         returnToMain(scanner);
     }
 
-     /**
+    /**
     * TODO
     */
     public static void addPatient(Scanner scanner) {
-      
-        if (numPatients < patientCapacity)
-        {
-        System.out.print("Enter patient name: ");
-        String name = scanner.next();
-        System.out.print("Enter patient age: ");
-        int age = scanner.nextInt();
-        System.out.print("Enter patient ID: ");
-        //TODO - ensure ID is unique
-        int id = scanner.nextInt();
-        Patient patient = new Patient(name, age, id);
-        patientList.add(patient);
-        System.out.println("Patient added successfully!");
-        numPatients++;
-        returnToMain(scanner);
+        if (numPatients < patientCapacity){
+            System.out.print("Enter patient name: ");
+            String name = scanner.next();
+            System.out.print("Enter patient age: ");
+            int age = scanner.nextInt();
+            System.out.print("Enter patient ID: ");
+            //TODO - ensure ID is unique
+            int id = scanner.nextInt();
+            Patient patient = new Patient(name, age, id);
+            patientList.add(patient);
+            System.out.println("Patient added successfully!");
+            numPatients++;
+            returnToMain(scanner);
         }
-      else 
-      {
+      else {
          System.out.println("Invalid Patient");
       }
     }
@@ -228,9 +261,18 @@ public class BigProject {
         if (scanner.hasNextLine()) {
             scanner.nextLine();
         }
-        System.out.print("\nPress 'enter' to return to the main menu...");
+        System.out.print("\n\tPress 'enter' to return to the main menu...");
         scanner.nextLine();
         System.out.println(""); // Print a blank line for spacing
+    }
+
+    /**
+     * TODO
+     * option1 - check in new user
+    */
+    public static int generateRandomSixDigitNumber() {
+        Random random = new Random();
+        return 100000 + random.nextInt(900000);
     }
 
     /** Preventing uncaught exceptions using try-catch CWE-248 
@@ -242,17 +284,48 @@ public class BigProject {
         try {
             addEmployee(scanner);
         } catch (Exception e) {
-            System.out.println("ERROR: could not add employee. Please add valid input");
-        }
-    }
-    public static void option2(Scanner scanner)
-    {
-        try {
-            addPatient(scanner);
-        } catch (Exception e) {
             System.out.println("ERROR: could not add patient. Please add valid input");
         }
     }
+
+    /**
+     * TODO
+     * option2 - admin mode
+    */
+    public static void option2(Scanner scanner, ArrayList<Employee> employeeList)
+    {
+        try {
+            Employee temp = null;
+            System.out.println("\tAdmin Login");;
+            System.out.print("Enter User ID: ");
+            int userId = scanner.nextInt();
+            for (Employee emp : employeeList) {
+                if (emp.id == userId) {
+                    temp= emp;
+                    break;
+                }
+            }
+            //Prompt for PIN
+            if (temp != null) {
+                System.out.print("Enter PIN: ");
+                int pin = scanner.nextInt();
+                // Check if the entered PIN matches the employee's PIN
+                if (temp.comparePIN(temp, pin) == true) {
+                    System.out.println("Login successful. Welcome, " + temp.name + "!");
+                    System.out.println("it is a shame admin mode cannot do anything lol");
+                } else {
+                    System.out.println("ERROR: Incorrect PIN. Returning...");
+                }
+            } else {
+                System.out.println("ERROR: User ID not found.");
+            }
+            
+        } catch (Exception e) {
+            System.out.println("ERROR: request could not be granted");
+        }
+        returnToMain(scanner);
+    }
+
     public static void option3(Scanner scanner)
     {
         try {
@@ -269,6 +342,15 @@ public class BigProject {
             System.out.println("ERROR: Unable to add prescription");
         }
     }
+    public static void option5(Scanner scanner)
+    {
+        try {
+            addPatient(scanner);
+        } catch (Exception e) {
+            System.out.println("ERROR: could not add patient. Please add valid input");
+        }
+    }
+
 
     //creates a copy of a patient's information by copying their Patient object.
     //method is private to ensure patient's information cannot be publically accessed through cloning. 
@@ -282,7 +364,38 @@ public class BigProject {
        }
     }
 
-    //Andrew - need to add method covering valid use of type conversion. Need input validation for methods.
+
+
+    /**
+     * TODO
+     * option5 - display current day and time
+     * 
+    */
+    public static void displayCurrentDayAndTime(Scanner scanner) 
+    {
+        String currentDay = daySystem.getCurrentDay();
+        int daysPassed = daySystem.getTotalDaysPassed();
+        String currentTime = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+        System.out.println("\nCurrent day: " + currentDay + ", Time: " + currentTime);
+        System.out.println("Total Days Passed: " + daysPassed);
+        returnToMain(scanner);
+    }
+
+    /*
+     * Finds the ratio of employees to patients.
+     * Converts from int to double - avoids CWE-681:Incorrect Conversion
+     * between Numeric Types as no information is lost in this conversion.
+     * @return double result from dividing size of employeeList by size of patientList 
+     */
+    private static double findRatio()
+    {
+        int numEmployees = employeeList.size(); 
+        int numPatients = patientList.size(); 
+
+        
+        return (double) numEmployees / numPatients; 
+    }
+
 
 
 }//END: MAIN CLASS 
@@ -293,28 +406,45 @@ public class BigProject {
 
 //CLASS: Employee
 class Employee {
-    private String name;
-    private String position;
-    private int id;
+    public String name;
+    public String position;
+    public int id;
+    private int pin;
 
-    public Employee(String name, String position, int id) {
+    public Employee(String name, String position, int id, int pin) {
         this.name = name;
         this.position = position;
         this.id = id;
+        this.pin = pin;
     }
 
-    // Getter methods
-    public String getName() { return name; }
-    public String getPosition() { return position; }
-    public int getId() { return id; }
+    // Getter methods - Avoids CWE-767: Access to Critical Private Variable in Public Method
+    //by ensuring crticial information can only be accessed through private methods. 
+    private String getName() { return name; }
+    private String getPosition() { return position; }
+    private int getId() { return id; }
+    private int getPin(){
+        return pin;
+    }
+
+    public boolean comparePIN(Employee x, int test)
+    {
+        if(test == x.pin)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+
+
 } //END: Employee
 
-
-
-
-
 //CLASS: Patient
-class Patient {
+class Patient implements Cloneable {
     private String name;
     private int age;
     private int id;
@@ -331,6 +461,7 @@ class Patient {
         Prescription ml = new Prescription(medList);
         med = ml;
     }
+
     //Returns a clone of the Patient object.
     //Avoids CWE-580: clone() method Without super.clone() by calling 
     //the necessary super.clone() method whenever cloning occurs. 
@@ -339,9 +470,10 @@ class Patient {
         return super.clone(); 
     }
 
-    // Getter methods
-    public String getName() { return name; }
-    public int getAge() { return age; }
+    // Getter methods - Avoids CWE-767: Access to Critical Private Variable in Public Method
+    //by ensuring crticial information can only be accessed through private methods. 
+    protected String getName() { return name; }
+    private int getAge() { return age; }
     public int getId() { return id; }
     public Prescription getMedList() { return med; }
 } //END: Patient
@@ -380,4 +512,43 @@ class Prescription {
         //returns a defensive copy of medList CWE-375
         return new ArrayList<>(medList);
     }
-}//END: medication
+}//END: Prescription
+
+
+//CLASS: day system
+class DaySystem implements Runnable {
+    private final String[] days = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+    private int dayIndex = 0;
+    private static int totalDaysPassed = 0; //shared resource
+    
+    @Override
+    public void run() {
+        while (Thread.currentThread().isInterrupted() == false) {
+            advanceDay();
+            try {
+                Thread.sleep(20000); //delay for 20 seconds before moving to the next day
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt(); //exit gracefully
+            }
+        }
+    }
+
+    public synchronized String getCurrentDay() {
+        return days[dayIndex];
+    }
+
+    public static synchronized int getTotalDaysPassed() {
+        return totalDaysPassed; //Safely retrieve total days passed
+    }
+
+    private synchronized void advanceDay() {
+        dayIndex = (dayIndex + 1) % days.length;
+        totalDaysPassed++; //Safely increment total days passed
+    }
+
+    public static synchronized void resetTotalDaysPassed() {
+        totalDaysPassed = 0; //Safely reset total days passed
+    }
+
+
+} //END: DaySystem
