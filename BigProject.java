@@ -18,6 +18,7 @@ public class BigProject {
     //Big Project Vars
     private static ArrayList<Employee> employeeList = new ArrayList<>();
     private static ArrayList<Patient> patientList = new ArrayList<>();
+    private static ArrayList<Person> personList = new ArrayList<Person>();
     private static DaySystem daySystem = new DaySystem();
     private static int numPatients = 0;
 
@@ -98,6 +99,9 @@ public class BigProject {
                         System.out.println("Patient list empty - cannot compute average\n"); 
                     }
                     break;
+                case 12:
+                    employeePatientNameSame();
+                    break;
                 default:
                     System.out.println("ERROR: not a valid choice. Try again.");
             }//end case
@@ -127,7 +131,7 @@ public class BigProject {
         System.out.println("OPTION 09: ");
         System.out.println("OPTION 10: Copy Patient Information");
         System.out.println("OPTION 11: Employee to Patient Ratio");
-        System.out.println("OPTION 12: ");
+        System.out.println("OPTION 12: Create Shared Name List");
         System.out.println("OPTION 13: ");
         return;
     }
@@ -370,6 +374,7 @@ public class BigProject {
     }
 
 
+
     //creates a copy of a patient's information by copying their Patient object.
     //method is private to ensure patient's information cannot be publically accessed through cloning. 
     private static Patient copyPatientInformation(Patient original)
@@ -382,6 +387,40 @@ public class BigProject {
        }
     }
 
+    /**
+     * Creates a list of all the employees with the same first name as a patient
+     * 
+     * Uses CWE-486 to safely compare employee and patient classes
+     */
+    public static ArrayList<String> employeePatientNameSame(){
+        ArrayList<String> sharedNames = new ArrayList<>();
+        combineList();
+        boolean atLeastOne = false;
+        for(Person p1: personList){
+            for(Person p2: personList){
+                if(p2.getClass() != p1.getClass() && p2.getName().equals(p1.getName()) && !sharedNames.contains(p1.getName())){
+                    sharedNames.add(p1.getName());
+                    atLeastOne = true;
+                }
+            }
+        }
+        if (atLeastOne){
+            System.out.println("\nThere are shared names!");
+        } else {
+            System.out.println("\nThere are no shared names between employees and patients");
+        }
+        return sharedNames;
+    }
+
+    public static void combineList(){
+        personList = new ArrayList<>();
+        for(Employee e: employeeList){
+            personList.add(e);
+        }
+        for(Patient p: patientList){
+            personList.add(p);
+        }
+    }
 
 
     /**
