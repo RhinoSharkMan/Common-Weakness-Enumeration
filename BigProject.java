@@ -141,12 +141,15 @@ public class BigProject {
         System.out.print("Enter employee position: ");
         String position = scanner.next();
         System.out.print("Enter employee ID: ");
-        //TODO - ensure ID is unique
         int id = scanner.nextInt();
-        int pin = generateRandomSixDigitNumber();
-        Employee employee = new Employee(name, position, id, pin);
-        employeeList.add(employee);
-        System.out.println("Employee added successfully!");
+        if(isUniqueID(id)){
+            int pin = generateRandomSixDigitNumber();
+            Employee employee = new Employee(name, position, id, pin);
+            employeeList.add(employee);
+            System.out.println("Employee added successfully!");
+        } else {
+            System.out.println("\nID is not unique");
+        }
         returnToMain(scanner);
     }
 
@@ -160,12 +163,15 @@ public class BigProject {
             System.out.print("Enter patient age: ");
             int age = scanner.nextInt();
             System.out.print("Enter patient ID: ");
-            //TODO - ensure ID is unique
             int id = scanner.nextInt();
-            Patient patient = new Patient(name, age, id);
-            patientList.add(patient);
-            System.out.println("Patient added successfully!");
-            numPatients++;
+            if(isUniqueID(id)) {
+                Patient patient = new Patient(name, age, id);
+                patientList.add(patient);
+                System.out.println("Patient added successfully!");
+                numPatients++;
+            } else {
+                System.out.println("\nID is not unique");
+            }
             returnToMain(scanner);
         }
       else {
@@ -199,6 +205,18 @@ public class BigProject {
         else{
             System.out.println("Patient ID not found");
         } 
+    }
+
+    private static boolean isUniqueID(int id){
+        for(Employee e: employeeList){
+            if(e.getId() == id)
+                return false;
+        }
+        for(Patient p: patientList){
+            if(p.getId() == id)
+                return false;
+        }
+        return true;
     }
 
      /**
@@ -401,28 +419,36 @@ public class BigProject {
 }//END: MAIN CLASS 
 
 
+abstract class Person{
+    private String name;
+    private int id;
 
+    public Person(String name, int id){
+        this.name = name;
+        this.id = id;
+    }
+    public int getId() { return id; }
+    public String getName() { return name; }
+
+}
 
 
 //CLASS: Employee
-class Employee {
+class Employee extends Person{
     public String name;
     public String position;
     public int id;
     private int pin;
 
     public Employee(String name, String position, int id, int pin) {
-        this.name = name;
+        super(name, id);
         this.position = position;
-        this.id = id;
         this.pin = pin;
     }
 
     // Getter methods - Avoids CWE-767: Access to Critical Private Variable in Public Method
     //by ensuring crticial information can only be accessed through private methods. 
-    private String getName() { return name; }
     private String getPosition() { return position; }
-    private int getId() { return id; }
     private int getPin(){
         return pin;
     }
@@ -444,16 +470,15 @@ class Employee {
 } //END: Employee
 
 //CLASS: Patient
-class Patient implements Cloneable {
+class Patient extends Person implements Cloneable {
     private String name;
     private int age;
     private int id;
     private Prescription med;
 
     public Patient(String name, int age, int id) {
-        this.name = name;
+        super(name, id);
         this.age = age;
-        this.id = id;
         this.med = null;
     }
 
@@ -472,9 +497,7 @@ class Patient implements Cloneable {
 
     // Getter methods - Avoids CWE-767: Access to Critical Private Variable in Public Method
     //by ensuring crticial information can only be accessed through private methods. 
-    protected String getName() { return name; }
     private int getAge() { return age; }
-    public int getId() { return id; }
     public Prescription getMedList() { return med; }
 } //END: Patient
 
