@@ -3,7 +3,7 @@ Project in IT 355
 
 ----CWE's in Use:----
 
-CHASE CONTENT
+# # # CHASE CONTENT # # # 
 # CWE-362: Concurrent Execution using Shared Resource with Improper Synchronization ('Race Condition')
 -this CWE is demonstated through the synchronization that exists with the shared resource int totalDaysPassed. 
 Modifications to this variable are protected via the synchronzied keyword
@@ -21,12 +21,16 @@ Done within the method generateRandomSixDigitNumber()
     * private final String[] days
 
 # CWE-460: Improper Cleanup on Thrown Exception
--this CWE is demonstated 
+-this CWE is demonstated in divideSupplies(). Specifically where the writer object is closed regardless of what logic 
+is executed in the function 
 
 # CWE CASE 06: CWE-125: Out-of-Bounds Read 
--this CWE is demonstated 
+-this CWE is demonstated in the function cogTest() Specifically the user has the ability to compare a value via index
+where the array set to a size of [7]. Because of this limiation, the function first validates that the user's input is 
+in a valid range before accessing the array
 
-ANDREW CONTENT
+
+# # # ANDREW CONTENT # # # 
 # CWE-681: Incorrect Conversion between Numeric Types
 -this CWE is demonstrated and avoided by only performing conversions when information is not lost. For example, an integer is converted to a double for a division operation. As this conversion does not lose information and is the intended operation of the program, this weakness is avoided. 
 
@@ -44,3 +48,13 @@ ANDREW CONTENT
 
 # CWE-767: Access to Critical Private Variable via Public Method
 -this CWE is demonstrated and avoided through preventing easy access to crticial values. Whenever these values are accessed or modified, it should be done in non public methods to prevent malicious users from modifying or accessing values without proper privileges.  
+
+# # # MIKEY CONTENT # # #
+# CWE-492
+-This CWE is demonstrated and avoided by not using any inner classes to store sensitive data.
+
+# CWE-248
+-This CWE is demonstrated by including a catch statement to catch exceptions.
+
+# CWE-607
+-This CWE is demonstrated by marking fields private static final in order to avoid public access to 
