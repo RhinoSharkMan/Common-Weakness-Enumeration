@@ -3,7 +3,7 @@ Project in IT 355
 
 ----CWE's in Use:----
 
-CHASE CONTENT
+# # # CHASE CONTENT # # # 
 # CWE-362: Concurrent Execution using Shared Resource with Improper Synchronization ('Race Condition')
 -this CWE is demonstated through the synchronization that exists with the shared resource int totalDaysPassed. 
 Modifications to this variable are protected via the synchronzied keyword
@@ -26,7 +26,8 @@ Done within the method generateRandomSixDigitNumber()
 # CWE CASE 06: CWE-125: Out-of-Bounds Read 
 -this CWE is demonstated 
 
-ANDREW CONTENT
+
+# # # ANDREW CONTENT # # # 
 # CWE-681: Incorrect Conversion between Numeric Types
 -this CWE is demonstrated and avoided by only performing conversions when information is not lost. For example, an integer is converted to a double for a division operation. As this conversion does not lose information and is the intended operation of the program, this weakness is avoided. 
 
