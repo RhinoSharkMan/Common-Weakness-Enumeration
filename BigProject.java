@@ -619,6 +619,7 @@ class Employee extends Person{
 } //END: Employee
 
 //CLASS: Patient
+//Prescription is not an inner class so we avoid CWE-492: use of inner class containing sensitive data
 class Patient extends Person implements Cloneable {
     private String name;
     private int age;
@@ -666,6 +667,7 @@ class Patient extends Person implements Cloneable {
 //CLASS: Prescription
 class Prescription {
     // marked private so that internal state of medList is only modified as intended - CWE-607
+    // Imutable so it is safe to pass medlist as a parameter CWE-374
     private static final ArrayList<String> medList = new ArrayList<>();
 
     public Prescription(ArrayList<String> medList){
