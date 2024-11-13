@@ -17,6 +17,7 @@ public class BigProject {
     public static final int patientCapacity = 300; 
 
     //Big Project Vars
+    //marking arraylists public static final would break CWE-607 because arraylists are mutable
     private static ArrayList<Employee> employeeList = new ArrayList<>();
     private static ArrayList<Patient> patientList = new ArrayList<>();
     private static ArrayList<Person> personList = new ArrayList<Person>();
@@ -683,10 +684,10 @@ class Patient extends Person implements Cloneable {
         this.age = age;
         this.med = null;
     }
-
+    //Passes a copy of the data because medList could be changed - CWE-374
     public void createPrescription(ArrayList<String> medList){
-        Prescription ml = new Prescription(medList);
-        med = ml;
+        ArrayList<String> medListCopy = new ArrayList<>(medList);
+        med = new Prescription(medListCopy);
     }
 
     /*
@@ -716,12 +717,12 @@ class Patient extends Person implements Cloneable {
 
 //CLASS: Prescription
 class Prescription {
-    // marked private so that internal state of medList is only modified as intended - CWE-607
-    // Imutable so it is safe to pass medlist as a parameter CWE-374
-    private static final ArrayList<String> medList = new ArrayList<>();
+    // not marked private static final because arraylists are mutable - CWE-607
+    private ArrayList<String> medList;
 
-    public Prescription(ArrayList<String> medList){
-        
+    // Initialize medList as a copy of the provided list to prevent external modification
+    public Prescription(ArrayList<String> initialMedList){
+        this.medList = new ArrayList<>(initialMedList); // Defensive copy CWE-375
     }
 
     public void addMedication(String med){
