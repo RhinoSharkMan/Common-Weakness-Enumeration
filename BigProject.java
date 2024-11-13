@@ -52,10 +52,10 @@ public class BigProject {
                     dayThread.interrupt();
                     break; //exit the loop
                 case 1:
-                    option1(scanner);
+                    newEmployee(scanner);
                     break;
                 case 2:
-                    option2(scanner, employeeList);
+                    adminLogin(scanner, employeeList);
                     break;
                 case 3:
                     option3(scanner);
@@ -71,7 +71,7 @@ public class BigProject {
                     break;
                 //ISSUE - Not correctly copying 
                 case 7:
-                    option7(scanner);
+                    cogTest(scanner);
                 break;
                 case 8:
                     option8(scanner);
@@ -172,8 +172,12 @@ public class BigProject {
     }
 
     /**
-    * TODO
-    */
+     * Adds a new patient to the patient list if the capacity allows.
+     * Prompts the user to enter Patient data
+     * Ensures the ID is unique before adding the patient to the list.
+     * 
+     * @param scanner a Scanner object to read user input
+     */
     public static void addPatient(Scanner scanner) {
         if (numPatients < patientCapacity){
             System.out.print("Enter patient name: ");
@@ -193,7 +197,7 @@ public class BigProject {
             returnToMain(scanner);
         }
       else {
-         System.out.println("Invalid Patient");
+         System.out.println("Invalid Action");
       }
     }
 
@@ -225,6 +229,9 @@ public class BigProject {
         } 
     }
 
+    /**
+    * TODO
+    */
     private static boolean isUniqueID(int id){
         for(Employee e: employeeList){
             if(e.getId() == id)
@@ -300,22 +307,27 @@ public class BigProject {
         System.out.print("\n\tPress 'enter' to return to the main menu...");
         scanner.nextLine();
         System.out.println(""); // Print a blank line for spacing
+        return;
     }
 
     /**
-     * TODO
-     * generates a random 6 digit number
-    */
+     * Generates a random six-digit number.
+     * The generated number is between 100000 and 999999.
+     * 
+     * @return a random six-digit integer
+     */
     public static int generateRandomSixDigitNumber() {
         Random random = new Random();
         return 100000 + random.nextInt(900000);
     }
 
-    /** Preventing uncaught exceptions using try-catch CWE-248 
-     * TODO
-     * option1 - check in new user
-    */
-    public static void option1(Scanner scanner)
+    /**
+     * Checks in a new user by invoking the addEmployee method.
+     * option1
+     * 
+     * @param scanner a Scanner object to read user input
+     */
+    public static void newEmployee(Scanner scanner)
     {
         try {
             addEmployee(scanner);
@@ -325,10 +337,15 @@ public class BigProject {
     }
 
     /**
-     * TODO
-     * option2 - admin mode
-    */
-    public static void option2(Scanner scanner, ArrayList<Employee> employeeList)
+     * Admin mode for verifying an employee's credentials.
+     * Prompts the user to enter their user ID and PIN to authenticate as an admin.
+     * If the ID and PIN match an employee in the list, access is granted; otherwise, an error is displayed.
+     * option2
+     * 
+     * @param scanner a Scanner object to read user input
+     * @param employeeList the list of employees to search for the provided user ID
+     */
+    public static void adminLogin(Scanner scanner, ArrayList<Employee> employeeList)
     {
         try {
             Employee temp = null;
@@ -390,27 +407,43 @@ public class BigProject {
     }
 
     /**
-     * TODO
-     * option7 - cog. test
+     * cogTest - A cognitive test
+     * prompts to input the corresponding day of the week (1-7) for Monday
+     * option 7
      * 
-    */
-    public static void option7(Scanner scanner) {
-        System.out.println("Employee List:");
-        if (employeeList.isEmpty()) {
-            System.out.println("\tNo employees available.");
-        } else {
-            for (Employee employee : employeeList) {
-                System.out.println("\t" + employee.toString());  
+     * @param scanner a Scanner object to read user input
+     */
+    public static void cogTest(Scanner scanner) {
+        DaySystem daySystem = new DaySystem();
+        String[] days = daySystem.days; 
+        System.out.println("Monday is the _nd day of the week (answer 1-7)?");
+        System.out.print("Answer: ");
+        try {
+            int userAnswer = scanner.nextInt();
+            if (userAnswer < 1 || userAnswer > 7) { //ensure out-of-bounds read does not occur
+                System.out.println("Incorrect. Doctors have been alerted" );
             }
+            //check correct
+            else if (days[userAnswer-1] == days[1]) {  //read is here
+                System.out.println("Correct!...You are a genius!");
+            } 
+            else {
+                System.out.println("Incorrect. You should see a doctor");
+            }
+        //catch any exception 
+        } catch (Exception e) {
+            System.out.println("Invalid input. Incorrect. Doctors have been alerted");
         }
         returnToMain(scanner);
     }
     
     /**
-     * TODO
-     * option8 - displays the list of employees
-     * 
-    */
+     * Displays the list of employees.
+     * Prints each employee's details if the list is not empty, or a message if no employees are available.
+     * option8
+     *
+     * @param scanner a Scanner object to read user input
+     */
     public static void option8(Scanner scanner) {
         System.out.println("Employee List:");
         if (employeeList.isEmpty()) {
@@ -424,10 +457,11 @@ public class BigProject {
     }
 
     /**
-     * TODO
-     * option9 - ddisplays the list of patients
-     * 
-    */
+     * Displays the list of patients.
+     * Prints each patient's details if the list is not empty, or a message if no patients are available.
+     * option 9
+     * @param scanner a Scanner object to read user input
+     */
     public static void option9(Scanner scanner) {
         System.out.println("Patient List:");
         if (patientList.isEmpty()) {
@@ -447,25 +481,41 @@ public class BigProject {
      * @param scanner a Scanner object to read user input
      */
     public static void divideSupply(Scanner scanner) {
+        //setup
         int totalEmployees = employeeList.size();
         int totalPatients = patientList.size();
         int totalCount = totalEmployees + totalPatients;
+        FileWriter writer = null; 
+        //display
         System.out.println("\nTotal Number of People in System: " + totalCount);
         System.out.print("Enter the number of supplies to divide among employees and patients: ");
         try {
+            //initialize FileWriter and write the result to the file
+            writer = new FileWriter("result.txt");
             int supplies = scanner.nextInt();
             int result = supplies/totalCount;
-            System.out.println("\tEach Person recieves" + result + " of the product.");
-
+            System.out.println("\tEach Person recieves " + result + " of the supplies.\nData Recorded.");
+            writer.write("Calculation = " + result + "\n");
         //catch exceptions
         } catch (InputMismatchException e) { 
-            System.out.println("Invalid input. Please enter an integer.");
-            scanner.next();  //clear the invalid input
+            System.out.println("ERROR: Invalid input. Please enter an integer.");
         }
         catch (ArithmeticException e) {
-            System.out.println("Cannot divide by zero. Please enter a non-zero number.");
+            System.out.println("ERROR: Cannot divide by zero. Please enter a non-zero number.");
         }
-    
+        catch (IOException e) {
+            System.out.println("ERROR: file error");
+        }
+        finally
+        {
+            if (writer != null) {
+                try {
+                    writer.close();
+                } catch (IOException e) {
+                    System.out.println("ERROR: Failed to close the file writer.");
+                }
+            }
+    }
         returnToMain(scanner);
     }
 
@@ -704,7 +754,7 @@ class Prescription {
 
 //CLASS: DaySystem
 class DaySystem implements Runnable {
-    private final String[] days = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+    public final String[] days = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
     private int dayIndex = 0;
     private static int totalDaysPassed = 0; //shared resource
     
