@@ -21,10 +21,13 @@ Done within the method generateRandomSixDigitNumber()
     * private final String[] days
 
 # CWE-460: Improper Cleanup on Thrown Exception
--this CWE is demonstated 
+-this CWE is demonstated in divideSupplies(). Specifically where the writer object is closed regardless of what logic 
+is executed in the function 
 
 # CWE CASE 06: CWE-125: Out-of-Bounds Read 
--this CWE is demonstated 
+-this CWE is demonstated in the function cogTest() Specifically the user has the ability to compare a value via index
+where the array set to a size of [7]. Because of this limiation, the function first validates that the user's input is 
+in a valid range before accessing the array
 
 
 # # # ANDREW CONTENT # # # 
