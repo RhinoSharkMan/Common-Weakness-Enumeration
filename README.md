@@ -48,3 +48,13 @@ in a valid range before accessing the array
 
 # CWE-767: Access to Critical Private Variable via Public Method
 -this CWE is demonstrated and avoided through preventing easy access to crticial values. Whenever these values are accessed or modified, it should be done in non public methods to prevent malicious users from modifying or accessing values without proper privileges.  
+
+# # # MIKEY CONTENT # # #
+# CWE-492
+-This CWE is demonstrated and avoided by not using any inner classes to store sensitive data.
+
+# CWE-248
+-This CWE is demonstrated by including a catch statement to catch exceptions.
+
+# CWE-607
+-This CWE is demonstrated by marking fields private static final in order to avoid public access to 
