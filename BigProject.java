@@ -115,6 +115,7 @@ public class BigProject {
                     break;
                 case 13:
                     divideSupply(scanner);
+                    break;
                 case 14:
                     reset(scanner);
                     break;
@@ -147,7 +148,7 @@ public class BigProject {
         System.out.println("OPTION 09: See all Patients");
         System.out.println("OPTION 10: Copy Patient Information");
         System.out.println("OPTION 11: Employee to Patient Ratio");
-        System.out.println("OPTION 12: Create Shared Name List");
+        System.out.println("OPTION 12: Check for Shared Names");
         System.out.println("OPTION 13: Divide Supplies");
         System.out.println("OPTION 14: Reset Application");
         return;
@@ -493,7 +494,7 @@ public class BigProject {
             writer = new FileWriter("result.txt");
             int supplies = scanner.nextInt();
             int result = supplies/totalCount;
-            System.out.println("\tEach Person recieves " + result + " of the supplies.\nData Recorded.");
+            System.out.println("\tEach Person recieves " + result + " of the supplies...Data Recorded.");
             writer.write("Calculation = " + result + "\n");
         //catch exceptions
         } catch (InputMismatchException e) { 
