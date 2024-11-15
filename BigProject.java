@@ -501,7 +501,7 @@ public class BigProject {
             System.out.println("ERROR: Invalid input. Please enter an integer.");
         }
         catch (ArithmeticException e) {
-            System.out.println("ERROR: Cannot divide by zero. Please enter a non-zero number.");
+            System.out.println("ERROR: Cannot divide by zero.");
         }
         catch (IOException e) {
             System.out.println("ERROR: file error");
