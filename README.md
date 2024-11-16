@@ -59,6 +59,26 @@ in a valid range before accessing the array
 # CWE-607
 -This CWE is demonstrated by marking fields private static final in order to avoid public access to 
 
-# # # LIAM CONTENT # # # 
 
-# # # TREVOR CONTENT # # # 
+
+# # # LIAM'S CONTECT # # #
+# CWE-192: Integer Coercion Error
+-This CWE is demonstrated by coercing an integer value to short to store in the order "database"
+
+# CWE-190: Integer Overflow or Wraparound
+-This CWE
+
+# CWE-572: Call to Thread run() instead of start()
+-This CWE is demonstrated by the DaySystem and OrderThread using start()
+instead of run() to begin a new thread of control
+
+# CWE-366: Race Condition within a Thread
+-This CWE is demonstrated by OrderThread with the use of the mutex.lock()
+taking advantage of the locking functionality by locking a thread and unlocking the thread when complete
+
+# CWE-609: Double-Checked Locking
+-This CWE is demonstrated in orders, Orders order Orders.getInstance(); to
+check if orders is initialized.
+
+# CWE-798: Use of Hard-coded Credentials
+-This CWE
