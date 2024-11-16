@@ -1,3 +1,4 @@
+package BigProject;
 //GROUP PROJECT 2 - IT 355
 
 //Imports
@@ -26,11 +27,12 @@ public class BigProject {
 
     /**
      * Main method
-     */
-    public static void main(String[] args){
+          * @throws IOException 
+          */
+         public static void main(String[] args) throws IOException{
         //Start the day-cycling thread
         Thread dayThread = new Thread(daySystem);
-        dayThread.start();
+        dayThread.start(); // CWE-572 using start() instead of run()
         //setup variables
         Scanner scanner = new Scanner(System.in);
         int control = 0;
@@ -116,6 +118,9 @@ public class BigProject {
                 case 13:
                     divideSupply(scanner);
                     break;
+                case 14:
+                    orders(scanner);
+                    break;
                 default:
                     System.out.println("ERROR: not a valid choice. Try again.");
             }//end case
@@ -148,6 +153,7 @@ public class BigProject {
         System.out.println("OPTION 11: Employee to Patient Ratio");
         System.out.println("OPTION 12: Create Shared Name List");
         System.out.println("OPTION 13: Divide Supplies");
+        System.out.println("OPTION 14: Manage orders");
         return;
     }
 
@@ -600,6 +606,56 @@ public class BigProject {
 
 
 
+    // Function that reviews and manages orders
+    private static void orders(Scanner scanner) throws IOException{
+        int controls = 0;
+        Orders order = Orders.getInstance(); // CWE-609
+
+        while(controls != -1){
+            order.ordermenu(); // Dislay the order menu
+            controls = validateIntInput(controls, scanner); // Get user input for what action they want to undertake
+            int userinput = 0;
+
+            // Switch for all actions avaliable to user
+            switch (controls) {
+                case -1:
+                    System.out.println("\nThank you...exiting");
+                    break;
+                case 1:
+                    System.out.println("Enter order number: ");
+                    userinput = validateIntInput(userinput, scanner);
+                    if(order.validateShortInput(userinput)){
+                        order.processOrder((short) userinput);
+                    }
+                    break;
+                case 2:
+                    System.out.println("Enter order number: ");
+                    userinput = validateIntInput(userinput, scanner);
+                    if(order.validateShortInput(userinput)){
+                        order.findOrder((short) userinput);
+                    }
+                    break;
+                case 3:
+                    System.out.println("Enter order number: ");
+                    userinput = validateIntInput(userinput, scanner);
+                    if(order.validateShortInput(userinput)){
+                        order.addOrder((short) userinput);
+                    }
+                    break;
+                case 4:
+                    System.out.println("How many orders would you like to create: ");
+                    userinput = validateIntInput(userinput, scanner);
+                    order.createMultOrders(userinput, scanner);
+                    break;
+                default:
+                    System.out.println("Command not reconized, please try again.");
+                    break;
+            }
+        }
+    }
+
+
+
 
 
 }//END: MAIN CLASS 
@@ -623,7 +679,7 @@ class Employee extends Person{
     public String name;
     public String position;
     public int id;
-    private int pin;
+    // private int pin;
 
     /*
      * constructor
@@ -633,28 +689,65 @@ class Employee extends Person{
         this.name = name; //prevents shadowing
         this.id = id; //prevents shadowing
         this.position = position;
-        this.pin = pin;
+        addPinToFile(id, pin);
+        // this.pin = retrievePinFromFile(id);
     }
 
     // Getter methods - Avoids CWE-767: Access to Critical Private Variable in Public Method
     //by ensuring crticial information can only be accessed through private methods. 
     private String getPosition() { return position; }
     private int getPin(){
-        return pin;
+        return retrievePinFromFile(id);
     }
 
     /*
      * comparePIN()
      */
+
+    // ADD LOGIC TO MAKE SURE THAT PINS ARE NOT HARD CODED INTO THE PROGRAM!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     public boolean comparePIN(Employee x, int test)
     {
-        if(test == x.pin)
+        if(test == retrievePinFromFile(x.getId()))
         {
             return true;
         }
         else
         {
             return false;
+        }
+    }
+
+    // CWE 798 making sure that password is not hard coded
+    private int retrievePinFromFile(int employeeId) {
+        String filePath = "BigProject/passwordData.dat"; // Path to the file
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(","); // file format is "id,pin"
+                if (parts.length == 2) {
+                    int id = Integer.parseInt(parts[0].trim());
+                    int pin = Integer.parseInt(parts[1].trim());
+                    if (id == employeeId) {
+                        return pin; // Return PIN if the ID matches
+                    }
+                }
+            }
+        } catch (IOException | NumberFormatException e) {
+            System.err.println("Error reading PIN file: " + e.getMessage());
+        }
+        throw new IllegalArgumentException("PIN for employee ID " + employeeId + " not found.");
+    }
+
+
+    public static void addPinToFile(int employeeId, int pin) {
+        String filePath = "BigProject/passwordData.dat"; // Path to the file
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true))) {
+            // Append the new employee ID and PIN to the file
+            writer.write(employeeId + "," + pin);
+            writer.newLine();
+            System.out.println("PIN for employee ID " + employeeId + " added successfully.");
+        } catch (IOException e) {
+            System.err.println("Error writing PIN to file: " + e.getMessage());
         }
     }
 
