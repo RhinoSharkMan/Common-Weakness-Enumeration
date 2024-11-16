@@ -121,6 +121,9 @@ public class BigProject {
                 case 14:
                     orders(scanner);
                     break;
+                case 15:
+                    reset(scanner);
+                    break;
                 default:
                     System.out.println("ERROR: not a valid choice. Try again.");
             }//end case
@@ -137,8 +140,7 @@ public class BigProject {
     /**
     * prints the dispaly options within our main program
     */
-    public static void printOptions()
-    {
+    public static void printOptions(){
         System.out.println("\n\tMake your choice:");
         System.out.println("OPTION 01: Check In New Employee");
         System.out.println("OPTION 02: Admin Mode");
@@ -151,9 +153,10 @@ public class BigProject {
         System.out.println("OPTION 09: See all Patients");
         System.out.println("OPTION 10: Copy Patient Information");
         System.out.println("OPTION 11: Employee to Patient Ratio");
-        System.out.println("OPTION 12: Create Shared Name List");
+        System.out.println("OPTION 12: Check for Shared Names");
         System.out.println("OPTION 13: Divide Supplies");
         System.out.println("OPTION 14: Manage orders");
+        System.out.println("OPTION 15: Reset Application");
         return;
     }
 
@@ -291,8 +294,7 @@ public class BigProject {
     * @param scanner the Scanner object used to read user input.
     * @return the validated integer value from the user input.
     */
-    public static int validateIntInput(int input, Scanner scanner)
-    {
+    public static int validateIntInput(int input, Scanner scanner){
         if (scanner.hasNextInt() == true) {
             input = scanner.nextInt();
             } 
@@ -306,8 +308,7 @@ public class BigProject {
     * Buffer to avoid skipping directly to main loop
     * @param scanner the Scanner object used to read user input.
     */
-    public static void returnToMain(Scanner scanner)
-    {
+    public static void returnToMain(Scanner scanner){
         if (scanner.hasNextLine()) {
             scanner.nextLine();
         }
@@ -334,8 +335,7 @@ public class BigProject {
      * 
      * @param scanner a Scanner object to read user input
      */
-    public static void newEmployee(Scanner scanner)
-    {
+    public static void newEmployee(Scanner scanner){
         try {
             addEmployee(scanner);
         } catch (Exception e) {
@@ -352,8 +352,7 @@ public class BigProject {
      * @param scanner a Scanner object to read user input
      * @param employeeList the list of employees to search for the provided user ID
      */
-    public static void adminLogin(Scanner scanner, ArrayList<Employee> employeeList)
-    {
+    public static void adminLogin(Scanner scanner, ArrayList<Employee> employeeList){
         try {
             Employee temp = null;
             System.out.println("\tAdmin Login");;
@@ -501,14 +500,14 @@ public class BigProject {
             writer = new FileWriter("result.txt");
             int supplies = scanner.nextInt();
             int result = supplies/totalCount;
-            System.out.println("\tEach Person recieves " + result + " of the supplies.\nData Recorded.");
+            System.out.println("\tEach Person recieves " + result + " of the supplies...Data Recorded.");
             writer.write("Calculation = " + result + "\n");
         //catch exceptions
         } catch (InputMismatchException e) { 
             System.out.println("ERROR: Invalid input. Please enter an integer.");
         }
         catch (ArithmeticException e) {
-            System.out.println("ERROR: Cannot divide by zero. Please enter a non-zero number.");
+            System.out.println("ERROR: Cannot divide by zero.");
         }
         catch (IOException e) {
             System.out.println("ERROR: file error");
@@ -575,28 +574,46 @@ public class BigProject {
 
 
     /**
-     * TODO
-     * option5 - display current day and time
+     * Displays the current day and time along with the total number of days passed.
+     * Retrieves the current day from the DaySystem, formats the current time, 
+     * and shows the total days passed since a specific start date.
+     * option 6
      * 
-    */
-    public static void displayCurrentDayAndTime(Scanner scanner) 
-    {
+     * @param scanner a Scanner object to allow the user to navigate back to the main menu
+     */
+    public static void displayCurrentDayAndTime(Scanner scanner) {
         String currentDay = daySystem.getCurrentDay();
         int daysPassed = daySystem.getTotalDaysPassed();
-        String currentTime = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
-        System.out.println("\nCurrent day: " + currentDay + ", Time: " + currentTime);
-        System.out.println("Total Days Passed: " + daysPassed);
+                String currentTime = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+                System.out.println("\nCurrent day: " + currentDay + ", Time: " + currentTime);
+                System.out.println("Total Days Passed: " + daysPassed);
+                returnToMain(scanner);
+            }
+        
+    /**
+     * Clears all users from the employee and patient lists.
+     * This method resets the system by removing all employees and patients.
+     * option 14
+     * 
+     * @param scanner a Scanner object to allow the user to navigate back to the main menu
+     */
+
+    public static void reset(Scanner scanner) {
+        employeeList.clear();
+        patientList.clear();
+        daySystem.resetTotalDaysPassed();
+        System.out.println("All employees and patients have been removed.");
         returnToMain(scanner);
     }
-
-    /*
-     * Finds the ratio of employees to patients.
-     * Converts from int to double - avoids CWE-681:Incorrect Conversion
-     * between Numeric Types as no information is lost in this conversion.
-     * @return double result from dividing size of employeeList by size of patientList 
-     */
-    private static double findRatio()
-    {
+        
+    /**
+    * Finds the ratio of employees to patients.
+    * Converts from int to double - avoids CWE-681:Incorrect Conversion
+    * between Numeric Types as no information is lost in this conversion.
+    *
+    * @return double result from dividing size of employeeList by size of patientList 
+    */
+    private static double findRatio(){
         int numEmployees = employeeList.size(); 
         int numPatients = patientList.size(); 
 
@@ -659,7 +676,7 @@ public class BigProject {
 
 
 }//END: MAIN CLASS 
-
+    
 //CLASS: Person
 abstract class Person{
     protected String name;
@@ -682,8 +699,8 @@ class Employee extends Person{
     // private int pin;
 
     /*
-     * constructor
-     */
+        * constructor
+        */
     public Employee(String name, String position, int id, int pin) {
         super(name, id);
         this.name = name; //prevents shadowing
@@ -752,8 +769,8 @@ class Employee extends Person{
     }
 
     /*
-     * toString
-     */
+        * toString
+        */
     @Override
     public String toString() {
         return "Employee ID: " + id +", Name: " +name +", Position: " + position;
@@ -784,8 +801,8 @@ class Patient extends Person implements Cloneable {
     }
 
     /*
-     * toString
-     */
+        * toString
+        */
     @Override
     public String toString() {
         return "Patient ID: " + id +", Name: " + name +", Age: " + age;
@@ -820,7 +837,7 @@ class Prescription {
 
     public void addMedication(String med){
         medList.add(med);
-       
+        
     }
 
     public void exportMedList(){
@@ -868,8 +885,8 @@ class DaySystem implements Runnable {
         return days[dayIndex];
     }
 
-    public static synchronized int getTotalDaysPassed() {
-        return totalDaysPassed; //Safely retrieve total days passed
+    public synchronized int getTotalDaysPassed() {
+    return totalDaysPassed; //Safely retrieve total days passed
     }
 
     private synchronized void advanceDay() {
@@ -877,7 +894,7 @@ class DaySystem implements Runnable {
         totalDaysPassed++; //Safely increment total days passed
     }
 
-    public static synchronized void resetTotalDaysPassed() {
+    public synchronized void resetTotalDaysPassed() {
         totalDaysPassed = 0; //Safely reset total days passed
     }
 
