@@ -118,9 +118,6 @@ public class BigProject {
                 case 13:
                     divideSupply(scanner);
                     break;
-                case 14:
-                    reset(scanner);
-                    break;
                 case 15:
                 System.out.println("Provide index of Patient to copy:");
                 int pIndex = scanner.nextInt();
@@ -134,6 +131,10 @@ public class BigProject {
                     System.out.println("Patient index out of range\n");
                     }
                     break;
+                    case 16:
+                    reset(scanner);
+                    break;
+                
                 //CWE-478: Missing Default Case in Multiple Condition Expression complient has default expression
                 default:
                     System.out.println("ERROR: not a valid choice. Try again.");
