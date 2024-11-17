@@ -1,4 +1,3 @@
-package BigProject;
 //GROUP PROJECT 2 - IT 355
 
 //Imports
@@ -6,6 +5,7 @@ import java.io.*;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.InputMismatchException;
 import java.util.Random;
 import java.util.Scanner;
@@ -15,6 +15,7 @@ public class BigProject {
 
 
     //Avoids CWE-500: Public Static Field Not Marked Final by making global variable a constant
+    //Avoids CWE-493: Critical Public Variable without Final modifier
     public static final int patientCapacity = 300; 
 
     //Big Project Vars
@@ -27,12 +28,11 @@ public class BigProject {
 
     /**
      * Main method
-          * @throws IOException 
-          */
-         public static void main(String[] args) throws IOException{
+     */
+    public static void main(String[] args) throws IOException, Throwable{
         //Start the day-cycling thread
         Thread dayThread = new Thread(daySystem);
-        dayThread.start(); // CWE-572 using start() instead of run()
+        dayThread.start();
         //setup variables
         Scanner scanner = new Scanner(System.in);
         int control = 0;
@@ -118,12 +118,24 @@ public class BigProject {
                 case 13:
                     divideSupply(scanner);
                     break;
-                case 14:
-                    orders(scanner);
-                    break;
                 case 15:
+                System.out.println("Provide index of Patient to copy:");
+                int pIndex = scanner.nextInt();
+                    if (pIndex < patientList.size() && pIndex >= 0)
+                    {
+                        finalizePatient(patientList.get(pIndex));
+                    }
+
+                    else
+                    {
+                    System.out.println("Patient index out of range\n");
+                    }
+                    break;
+                    case 16:
                     reset(scanner);
                     break;
+                
+                //CWE-478: Missing Default Case in Multiple Condition Expression complient has default expression
                 default:
                     System.out.println("ERROR: not a valid choice. Try again.");
             }//end case
@@ -155,8 +167,8 @@ public class BigProject {
         System.out.println("OPTION 11: Employee to Patient Ratio");
         System.out.println("OPTION 12: Check for Shared Names");
         System.out.println("OPTION 13: Divide Supplies");
-        System.out.println("OPTION 14: Manage orders");
-        System.out.println("OPTION 15: Reset Application");
+        System.out.println("OPTION 15: Finalize Patient");
+        System.out.println("OPTION 16: Reset Application");
         return;
     }
 
@@ -226,6 +238,7 @@ public class BigProject {
             }
         }
         if(found){
+            //Checks CWE-476: NULL Pointer Dereference
             if(patient.getMedList()!=null){
                 patient.getMedList().exportMedList();
             }
@@ -271,6 +284,7 @@ public class BigProject {
             }
         }
         if(found){
+            //Checks CWE-476: NULL Pointer Dereference
             if(patient.getMedList()!=null){
                 patient.getMedList().addMedication(medication);
                 System.out.println("Medication successfully added to prescription");
@@ -295,13 +309,20 @@ public class BigProject {
     * @return the validated integer value from the user input.
     */
     public static int validateIntInput(int input, Scanner scanner){
-        if (scanner.hasNextInt() == true) {
-            input = scanner.nextInt();
-            } 
-        else {
-            scanner.next(); //clear the invalid input
-            }
-        return input;
+        boolean valid = false;
+        while (!valid) {
+            if (scanner.hasNextInt() == true) {
+                input = scanner.nextInt();
+                valid=true;
+                } 
+            else {
+                System.out.println("Invalid input. Please enter an integer.");
+                scanner.next(); //clear the invalid input
+                }
+        }
+        
+            
+            return input;
     }
 
     /**
@@ -339,6 +360,7 @@ public class BigProject {
         try {
             addEmployee(scanner);
         } catch (Exception e) {
+
             System.out.println("ERROR: could not add patient. Please add valid input");
         }
     }
@@ -365,6 +387,7 @@ public class BigProject {
                 }
             }
             //Prompt for PIN
+            //Checks CWE-476: NULL Pointer Dereference
             if (temp != null) {
                 System.out.print("Enter PIN: ");
                 int pin = scanner.nextInt();
@@ -373,10 +396,12 @@ public class BigProject {
                     System.out.println("Login successful. Welcome, " + temp.name + "!");
                     System.out.println("it is a shame admin mode cannot do anything lol");
                 } else {
-                    System.out.println("ERROR: Incorrect PIN. Returning...");
+                    //CWE-209: Generation of Error Message Containing Sensitive information
+                    //Changed to be complient
+                    System.out.println("ERROR: Invalid credentials. Returning...");
                 }
             } else {
-                System.out.println("ERROR: User ID not found.");
+                System.out.println("ERROR: Invalid credentials.");
             }
             
         } catch (Exception e) {
@@ -537,6 +562,17 @@ public class BigProject {
        }
     }
 
+    //finalization with accordance to CWE-583: finalize() Method Declared Public and CWE-568: finalize() Method Without super.finalize()
+    private static void finalizePatient(Patient original) throws Throwable{
+        try {
+            original.PateintFinalize();
+            System.out.println("Patient successfully finalized.");
+        } catch (Exception e) {
+            System.out.println("Patient invalid, unable to finalize: "+ e.getMessage());
+        } 
+    }
+
+
     /**
      * Creates a list of all the employees with the same first name as a patient
      * 
@@ -621,62 +657,10 @@ public class BigProject {
         return (double) numEmployees / numPatients; 
     }
 
-
-
-    // Function that reviews and manages orders
-    private static void orders(Scanner scanner) throws IOException{
-        int controls = 0;
-        Orders order = Orders.getInstance(); // CWE-609
-
-        while(controls != -1){
-            order.ordermenu(); // Dislay the order menu
-            controls = validateIntInput(controls, scanner); // Get user input for what action they want to undertake
-            int userinput = 0;
-
-            // Switch for all actions avaliable to user
-            switch (controls) {
-                case -1:
-                    System.out.println("\nThank you...exiting");
-                    break;
-                case 1:
-                    System.out.println("Enter order number: ");
-                    userinput = validateIntInput(userinput, scanner);
-                    if(order.validateShortInput(userinput)){
-                        order.processOrder((short) userinput);
-                    }
-                    break;
-                case 2:
-                    System.out.println("Enter order number: ");
-                    userinput = validateIntInput(userinput, scanner);
-                    if(order.validateShortInput(userinput)){
-                        order.findOrder((short) userinput);
-                    }
-                    break;
-                case 3:
-                    System.out.println("Enter order number: ");
-                    userinput = validateIntInput(userinput, scanner);
-                    if(order.validateShortInput(userinput)){
-                        order.addOrder((short) userinput);
-                    }
-                    break;
-                case 4:
-                    System.out.println("How many orders would you like to create: ");
-                    userinput = validateIntInput(userinput, scanner);
-                    order.createMultOrders(userinput, scanner);
-                    break;
-                default:
-                    System.out.println("Command not reconized, please try again.");
-                    break;
-            }
-        }
-    }
-
-
-
-
-
+    
 }//END: MAIN CLASS 
     
+
 //CLASS: Person
 abstract class Person{
     protected String name;
@@ -696,7 +680,7 @@ class Employee extends Person{
     public String name;
     public String position;
     public int id;
-    // private int pin;
+    private int pin;
 
     /*
         * constructor
@@ -706,65 +690,28 @@ class Employee extends Person{
         this.name = name; //prevents shadowing
         this.id = id; //prevents shadowing
         this.position = position;
-        addPinToFile(id, pin);
-        // this.pin = retrievePinFromFile(id);
+        this.pin = pin;
     }
 
     // Getter methods - Avoids CWE-767: Access to Critical Private Variable in Public Method
     //by ensuring crticial information can only be accessed through private methods. 
     private String getPosition() { return position; }
     private int getPin(){
-        return retrievePinFromFile(id);
+        return pin;
     }
 
     /*
-     * comparePIN()
-     */
-
-    // ADD LOGIC TO MAKE SURE THAT PINS ARE NOT HARD CODED INTO THE PROGRAM!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        * comparePIN()
+        */
     public boolean comparePIN(Employee x, int test)
     {
-        if(test == retrievePinFromFile(x.getId()))
+        if(test == x.pin)
         {
             return true;
         }
         else
         {
             return false;
-        }
-    }
-
-    // CWE 798 making sure that password is not hard coded
-    private int retrievePinFromFile(int employeeId) {
-        String filePath = "BigProject/passwordData.dat"; // Path to the file
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(","); // file format is "id,pin"
-                if (parts.length == 2) {
-                    int id = Integer.parseInt(parts[0].trim());
-                    int pin = Integer.parseInt(parts[1].trim());
-                    if (id == employeeId) {
-                        return pin; // Return PIN if the ID matches
-                    }
-                }
-            }
-        } catch (IOException | NumberFormatException e) {
-            System.err.println("Error reading PIN file: " + e.getMessage());
-        }
-        throw new IllegalArgumentException("PIN for employee ID " + employeeId + " not found.");
-    }
-
-
-    public static void addPinToFile(int employeeId, int pin) {
-        String filePath = "BigProject/passwordData.dat"; // Path to the file
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true))) {
-            // Append the new employee ID and PIN to the file
-            writer.write(employeeId + "," + pin);
-            writer.newLine();
-            System.out.println("PIN for employee ID " + employeeId + " added successfully.");
-        } catch (IOException e) {
-            System.err.println("Error writing PIN to file: " + e.getMessage());
         }
     }
 
@@ -814,6 +761,13 @@ class Patient extends Person implements Cloneable {
     protected Object clone() throws CloneNotSupportedException
     {
         return super.clone(); 
+    }
+    
+    //Finalize with accordance with CWE-583: finalize() Method Declared Public and CWE-568: finalize() Method Without super.finalize()
+    //also informs which patient is finalized
+    protected void PateintFinalize() throws Throwable{
+        System.out.println("Finalizeing patient: " + name);
+        super.finalize();
     }
 
     // Getter methods - Avoids CWE-767: Access to Critical Private Variable in Public Method
@@ -897,6 +851,7 @@ class DaySystem implements Runnable {
     public synchronized void resetTotalDaysPassed() {
         totalDaysPassed = 0; //Safely reset total days passed
     }
+
 
 
 } //END: DaySystem
