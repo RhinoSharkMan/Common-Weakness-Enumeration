@@ -96,8 +96,8 @@ check if orders is initialized.
 # CWE-493 Critical Public Variable Without Final Modifier
 -This CWE is demonstrated by making sure public variables have the final modifier attached to them.
 
-# CWE-502 Deserialization of Untrusted Data
--This CWE is demonstrated by 
+# CWE-568 Finalize () Method Without super.finalize ()
+-This CWE is demonstrated by using super.finalize ()
 
 # CWE-583 Finalize method Declared public
--This CWE is demonstrated by 
+-This CWE is demonstrated by using the protected variable and calling the variable to access the Finalize method
