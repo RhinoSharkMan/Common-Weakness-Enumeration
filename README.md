@@ -83,3 +83,25 @@ check if orders is initialized.
 # CWE-798: Use of Hard-coded Credentials
 -This CWE is demonstrated in the employee class, by storing the employee pin
 outside of the code and calling it when need
+
+
+
+# # # Trevor's CONTENT # # #
+# CWE-209 Generation of Error Message Containing Sensitive Information
+-This CWE is demonstrated by avoiding the use of sensitive information in error messages.
+
+# CWE-476 NULL Pointer Dereference
+-This CWE is demonstrated by avoiding the use of NULL or performing checks to make sure NULL is avoided or acounted for.
+
+# CWE-478 Missing Default Case in Multiple Condition Expression
+-This CWE is demonstrated by using a default or base case when useing statements with multiple conditions.
+
+# CWE-493 Critical Public Variable Without Final Modifier
+-This CWE is demonstrated by making sure public variables have the final modifier attached to them.
+
+# CWE-568 Finalize () Method Without super.finalize ()
+-This CWE is demonstrated by using super.finalize ()
+
+# CWE-583 Finalize method Declared public
+-This CWE is demonstrated by using the protected variable and calling the variable to access the Finalize method
+
