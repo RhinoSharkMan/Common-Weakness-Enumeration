@@ -697,6 +697,9 @@ public class BigProject {
                     userinput = validateIntInput(userinput, scanner);
                     order.createMultOrders(userinput, scanner);
                     break;
+                case 5:
+                    order.calcYearToDateCost();
+                    break;
                 default:
                     System.out.println("Command not reconized, please try again.");
                     break;
