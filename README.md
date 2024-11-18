@@ -81,4 +81,5 @@ taking advantage of the locking functionality by locking a thread and unlocking 
 check if orders is initialized.
 
 # CWE-798: Use of Hard-coded Credentials
--This CWE
+-This CWE is demonstrated in the employee class, by storing the employee pin
+outside of the code and calling it when need

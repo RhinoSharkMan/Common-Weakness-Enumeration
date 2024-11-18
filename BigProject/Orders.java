@@ -14,7 +14,34 @@ public class Orders {
         System.out.println("OPTION 2: Find order ");
         System.out.println("OPTION 3: Add order ");
         System.out.println("OPTION 4: Create multiple orders");
+        System.out.println("OPTION 5: Calculate year to date order costs");
         System.out.println("OPTION -1: EXIT ");
+    }
+
+    public void calcYearToDateCost(){
+        String filePath = "BigProject\\orderSpending.dat";
+        int total = 0;
+        int holder;
+        try (Scanner scan = new Scanner(new File(filePath))){
+            while (scan.hasNext()) {
+                if(scan.hasNextInt()){
+                    holder = scan.nextInt();
+                    if((total) > Integer.MAX_VALUE - holder){
+                        System.out.println("The hospital spent to much and trying to figure out the full number would blow up the computer");
+                        return;
+                    }else{
+                        total += holder;
+                    }
+                }else{
+                    scan.next();
+                }
+            }
+            scan.close();
+        }catch(FileNotFoundException e){
+            System.err.println("File not found: " + filePath);
+            
+        }
+        System.out.println("The total year to date spending was: $" + total);
     }
 
 
