@@ -66,7 +66,7 @@ in a valid range before accessing the array
 -This CWE is demonstrated by coercing an integer value to short to store in the order "database"
 
 # CWE-190: Integer Overflow or Wraparound
--This CWE
+-This CWE is demonstrated by calcualting a error filled budget for the department of ordering and handeling overly large values 
 
 # CWE-572: Call to Thread run() instead of start()
 -This CWE is demonstrated by the DaySystem and OrderThread using start()

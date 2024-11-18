@@ -18,18 +18,23 @@ public class Orders {
         System.out.println("OPTION -1: EXIT ");
     }
 
+    // CWE-190 Integer Overflow or Wraparound
     public void calcYearToDateCost(){
         String filePath = "BigProject\\orderSpending.dat";
         int total = 0;
         int holder;
+        int error = 0;
         try (Scanner scan = new Scanner(new File(filePath))){
             while (scan.hasNext()) {
                 if(scan.hasNextInt()){
                     holder = scan.nextInt();
-                    if((total) > Integer.MAX_VALUE - holder){
-                        System.out.println("The hospital spent to much and trying to figure out the full number would blow up the computer");
-                        return;
-                    }else{
+                    if(total > 0 && holder > 0 && total > Integer.MAX_VALUE - holder){
+                        error++;
+                    }
+                    else if(total < 0 && holder < 0 && total < Integer.MIN_VALUE - holder){
+                        error++;
+                    }
+                    else{
                         total += holder;
                     }
                 }else{
@@ -42,6 +47,11 @@ public class Orders {
             
         }
         System.out.println("The total year to date spending was: $" + total);
+        if(error != 0){
+            System.out.println("There was " + error + " errors in the departments budget.");
+        }else{
+            System.out.println("There was no errors in the budget.");
+        }
     }
 
 
